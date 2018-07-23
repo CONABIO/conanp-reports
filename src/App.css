@@ -1,5 +1,18 @@
 .App-container {
-  position: relative;
+  position:absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.leaflet-container{
+  height: 100vh;
+}
+
+.App-map {
+  width: 40vw;
+  margin-left: 20vw;
+  height: 100vh;
 }
 
 .App-info {
