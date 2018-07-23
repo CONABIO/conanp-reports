@@ -23,12 +23,12 @@ class App extends Component {
   componentDidMount() {
     fetch(API)
       .then(response => {
-        console.log(response);
         return response.json();
       })
       .then(data => {
         this.setState({geojson:data,
                        ready:true});
+        console.log(this.state.geojson);
       });
   }
 
@@ -46,13 +46,17 @@ class App extends Component {
 
   getList() {
     let slice = this.state.geojson;
+    let names = slice.features.map(element => <li>{element.properties["NOMBRE"]}</li>);
+    return names;
   }
 
   render() {
     let geom = null;
+    let list = null;
     if (this.state.ready) {
       console.log("I am ready to paint!");
       geom = <GeoJSON data={this.getGeoJson()} style={this.getStyle} />
+      list = this.getList();
     }
 
     return (
@@ -74,9 +78,7 @@ class App extends Component {
         <Desktop>
           <div className="App-list">
             <ul>
-              <li>Desierto de los leones</li>
-              <li>Cañón del Sumidero</li>
-              <li>Mineral del chico</li>
+              {list}
             </ul>
           </div>
         </Desktop>

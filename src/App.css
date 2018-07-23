@@ -27,6 +27,7 @@
 .App-list {
   position: absolute;
   left:0;
+  overflow: scroll;
   top:0;
   background: #ccc;
   width: 20vw;
