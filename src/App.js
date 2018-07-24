@@ -26,8 +26,7 @@ class App extends Component {
       geojson: null,
       ready: false,
       boundBox: null,
-      listIsActive:true,
-      infoIsActive:true
+      selection: null,
     };
   }
 
@@ -52,9 +51,21 @@ class App extends Component {
   getStyle(feature, layer) {
     return {
       color: '#006400',
-      weight: 5,
+      weight: 1,
       opacity: 0.65
     }
+  }
+
+  onEachFeature(feature, layer) {
+    console.log("On each feature call.");
+    layer.on({
+      click: this.clickToFeature.bind(this)
+    });
+  }
+
+  clickToFeature(e) {
+     let layer = e.target;
+     this.setState({selection:layer.feature.properties});
   }
 
   getList() {
@@ -72,18 +83,6 @@ class App extends Component {
     this.getBoundingBoxFromMap();
   }
 
-  handleButtonHideList(event) {
-    console.log("Button was clicked");
-    let listIsActive = this.state.listIsActive;
-    this.setState({listIsActive:!listIsActive});
-  }
-
-  handleButtonHideInfo(event) {
-    console.log("Button was clicked");
-    let infoIsActive = this.state.infoIsActive;
-    this.setState({infoIsActive:!infoIsActive});
-  }
-
   getBoundingBoxFromMap() {
     let bounds = this.leafletMap.leafletElement.getBounds();
     let boundBox = [bounds.getWest(), 
@@ -98,7 +97,9 @@ class App extends Component {
     let list = null;
     if(this.state.ready) {
       console.log("I am ready to paint!");
-      geom = <GeoJSON data={this.getGeoJson()} style={this.getStyle} />
+      geom = <GeoJSON data={this.getGeoJson()} 
+                      style={this.getStyle} 
+                      onEachFeature={this.onEachFeature.bind(this)} />
       if(window.innerWidth > breakpoints.desktop) {
         console.log("Filtering list of polygons.");
         list = this.getList();
@@ -108,15 +109,9 @@ class App extends Component {
     return (
       <div className="App-container">
         <div className={"App-info" + (this.state.infoIsActive? "": " is-inactive")}>
-          <h1>Reporte ANP</h1>
+          <h1>{this.state.selection == null?"":this.state.selection.NOMBRE}</h1>
         </div>
         <div>
-          <button 
-            className="App-list-button"
-            onClick={(e)=>this.handleButtonHideList(e)}>&gt;</button>
-          <button 
-            className="App-info-button"
-            onClick={(e)=>this.handleButtonHideInfo(e)}>&gt;</button>
           <Map 
               className="App-map"
               center={position} 
