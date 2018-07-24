@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Responsive from 'react-responsive';
 import { Map, TileLayer, GeoJSON } from 'react-leaflet';
+import * as turf from '@turf/turf';
 
 const Desktop = props => <Responsive {...props} minWidth={992} />;
 //const Tablet = props => <Responsive {...props} minWidth={768} maxWidth={991} />;
@@ -16,7 +17,8 @@ class App extends Component {
     super(props);
     this.state = {
       geojson: null,
-      ready:false
+      ready: false,
+      boundBox: null
     };
   }
 
@@ -30,6 +32,7 @@ class App extends Component {
                        ready:true});
         console.log(this.state.geojson);
       });
+    this.getBoundingBoxFromMap();
   }
 
   getGeoJson() {
@@ -46,8 +49,33 @@ class App extends Component {
 
   getList() {
     let slice = this.state.geojson;
-    let names = slice.features.map(element => <li>{element.properties["NOMBRE"]}</li>);
+    let boundBoxPolygon = turf.polygon(this.state.boundBox);
+    let names = slice.features.filter(element => {
+                      //console.log(boundBoxPolygon);
+                      //console.log(element);
+                      //console.log(turf.intersect(boundBoxPolygon, element));
+                      
+
+                      return turf.intersect(boundBoxPolygon, element) != null;
+                    })
+                  .map((element, index) => <li key={index}>{element.properties["NOMBRE"]}</li>);
     return names;
+  }
+
+  handleOnZoomLevelsChange(event) {
+    this.getBoundingBoxFromMap();
+  }
+
+  getBoundingBoxFromMap() {
+    let bounds = this.leafletMap.leafletElement.getBounds();
+    let boundBox = [[
+                    [bounds.getEast(), bounds.getNorth()],
+                    [bounds.getWest(), bounds.getNorth()],
+                    [bounds.getWest(), bounds.getSouth()],
+                    [bounds.getEast(), bounds.getSouth()],
+                    [bounds.getEast(), bounds.getNorth()]
+                   ]];
+    this.setState({boundBox:boundBox});
   }
 
   render() {
@@ -67,9 +95,11 @@ class App extends Component {
         <Map 
             className="App-map"
             center={position} 
+            ref={map => { this.leafletMap = map; }} 
             zoom={zoom} 
             maxZoom={15} 
-            minZoom={3}>
+            minZoom={3}
+            onZoom={(e)=>this.handleOnZoomLevelsChange(e)} >
             <TileLayer
               attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
               url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
