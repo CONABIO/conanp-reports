@@ -49,16 +49,12 @@ class App extends Component {
 
   getList() {
     let slice = this.state.geojson;
-    let boundBoxPolygon = turf.polygon(this.state.boundBox);
+    let boundBoxPolygon = turf.bboxPolygon(this.state.boundBox);
     let names = slice.features.filter(element => {
-                      //console.log(boundBoxPolygon);
-                      //console.log(element);
-                      //console.log(turf.intersect(boundBoxPolygon, element));
-                      
-
-                      return turf.intersect(boundBoxPolygon, element) != null;
+                      let aux = turf.bboxPolygon(turf.bbox(element));
+                      return turf.intersect(boundBoxPolygon, aux) != null;
                     })
-                  .map((element, index) => <li key={index}>{element.properties["NOMBRE"]}</li>);
+                .map((element, index) => <li key={index}>{element.properties["NOMBRE"]}</li>);
     return names;
   }
 
@@ -69,13 +65,21 @@ class App extends Component {
   getBoundingBoxFromMap() {
     let bounds = this.leafletMap.leafletElement.getBounds();
     let boundBox = [[
-                    [bounds.getEast(), bounds.getNorth()],
                     [bounds.getWest(), bounds.getNorth()],
-                    [bounds.getWest(), bounds.getSouth()],
+                    [bounds.getEast(), bounds.getNorth()],
                     [bounds.getEast(), bounds.getSouth()],
-                    [bounds.getEast(), bounds.getNorth()]
+                    [bounds.getWest(), bounds.getSouth()],
+                    [bounds.getWest(), bounds.getNorth()]
                    ]];
-    this.setState({boundBox:boundBox});
+    let alternative = [bounds.getWest(), bounds.getNorth(), bounds.getEast(), bounds.getSouth()];
+
+    console.log("test");
+    console.log(bounds);
+    console.log(alternative);
+    console.log(turf.bboxPolygon(alternative));
+    console.log(turf.polygon(boundBox));
+
+    this.setState({boundBox:alternative});
   }
 
   render() {
@@ -99,7 +103,8 @@ class App extends Component {
             zoom={zoom} 
             maxZoom={15} 
             minZoom={3}
-            onZoom={(e)=>this.handleOnZoomLevelsChange(e)} >
+            onZoom={(e)=>this.handleOnZoomLevelsChange(e)} 
+            onMoveend={(e)=>this.handleOnZoomLevelsChange(e)} >
             <TileLayer
               attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
               url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
