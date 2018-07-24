@@ -18,7 +18,8 @@ class App extends Component {
     this.state = {
       geojson: null,
       ready: false,
-      boundBox: null
+      boundBox: null,
+
     };
   }
 
@@ -31,6 +32,7 @@ class App extends Component {
         this.setState({geojson:data,
                        ready:true});
         console.log(this.state.geojson);
+        console.log(new Set(this.state.geojson.features.map(element=>element.properties["ID_07"]).sort()));
       });
     this.getBoundingBoxFromMap();
   }
@@ -58,7 +60,7 @@ class App extends Component {
     return names;
   }
 
-  handleOnZoomLevelsChange(event) {
+  handleBoundingBoxChange(event) {
     this.getBoundingBoxFromMap();
   }
 
@@ -72,13 +74,6 @@ class App extends Component {
                     [bounds.getWest(), bounds.getNorth()]
                    ]];
     let alternative = [bounds.getWest(), bounds.getNorth(), bounds.getEast(), bounds.getSouth()];
-
-    console.log("test");
-    console.log(bounds);
-    console.log(alternative);
-    console.log(turf.bboxPolygon(alternative));
-    console.log(turf.polygon(boundBox));
-
     this.setState({boundBox:alternative});
   }
 
@@ -103,8 +98,8 @@ class App extends Component {
             zoom={zoom} 
             maxZoom={15} 
             minZoom={3}
-            onZoom={(e)=>this.handleOnZoomLevelsChange(e)} 
-            onMoveend={(e)=>this.handleOnZoomLevelsChange(e)} >
+            onZoom={(e)=>this.handleBoundingBoxChange(e)} 
+            onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
             <TileLayer
               attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
               url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
