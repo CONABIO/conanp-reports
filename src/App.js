@@ -117,19 +117,40 @@ class App extends Component {
               right: "0",
               top: "0",
               bottom: "0"}
+    } else if(window.innerWidth > breakpoints.tablet){
+      return {width:"100vw", 
+              height:"50vh", 
+              bottom:"0"}
     } else {
-      return {width:"100vw", height:"50vh", bottom:"0"}
+      console.log("mobile");
+      return {position: "fixed",
+              width: "100vw", 
+              height: "100vh", 
+              right: "0",
+              left: "0",
+              top: "0",
+              bottom: "0",
+              zIndex: "99",
+              transform: "translateX(100%)"};
     }
   }
 
   getStyleMap() {
-
+    console.log(window.innerWidth);
     if(window.innerWidth > breakpoints.desktop) { 
       return {width:"50vw", 
               height:"100vh",
               left:"20vw"};
+    } else if(window.innerWidth > breakpoints.tablet){
+      return {width:"100vw", 
+              height:"50vh"};
     } else {
-      return {width:"100vw", height:"50vh"};
+      return {width:"100vw", 
+              height:"100vh", 
+              right: "0",
+              left: "0",
+              top: "0",
+              bottom: "0"};
     }
   }
 
