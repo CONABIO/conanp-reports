@@ -3,6 +3,7 @@ import './App.css';
 //import Responsive from 'react-responsive';
 import { Map, TileLayer, GeoJSON } from 'react-leaflet';
 import * as turf from '@turf/turf';
+import 'bulma/css/bulma.css';
 
 
 const breakpoints = {
@@ -78,7 +79,7 @@ class App extends Component {
                     })
                 .map((element, index) => <li key={index} 
                                              value={element.properties[CODE]}
-                                             onClick={e => this.changeSelection(e)}>{element.properties[NAME]}</li>);
+                                             onClick={e => this.changeSelection(e)}><a>{element.properties[NAME]}</a></li>);
     return names;
   }
 
@@ -182,7 +183,7 @@ class App extends Component {
     console.log(slice);
     let options = slice.features.map((element, index) => <option key={index} 
                                              value={element.properties[CODE]}>{element.properties[NAME]}</option>);
-    return <select onChange={e=>this.changeSelection(e)}>{options}</select>;
+    return <select className="navbar-item" onChange={e=>this.changeSelection(e)}>{options}</select>;
   }
 
   renderButton(){
@@ -222,38 +223,49 @@ class App extends Component {
 
 
     return (
-
-      <div className="App-container">
-        <div className="App-Header">
-          {dropdown}
-        </div>
-        <div className={"App-info" + classMobileInfo}
-             style={this.getStyleInfo()}>
-          <h1>{this.state.selection == null?"":this.state.selection[NAME]}</h1>
-          {this.renderButton()}
-        </div>
-        <div className={"App-map-container" + classMobileMap}>
-          <Map 
-              className="App-map"
-              center={position} 
-              ref={map => { this.leafletMap = map; }} 
-              zoom={zoom} 
-              maxZoom={15} 
-              style={this.getStyleMap()}
-              minZoom={3}
-              onZoom={(e)=>this.handleBoundingBoxChange(e)} 
-              onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
-              <TileLayer
-                attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-                url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
-              {geom}
-          </Map>
-        </div>
-        <div className="App-list"
-             style={this.getStyleList()} >
-          <ul>
-            {list}
-          </ul>
+      <div>
+        <nav className="navbar" 
+             role="navigation" aria-label="main navigation">
+          <div className="navbar-brand">
+            <a className="navbar-item">Reportes CONANP</a>
+            {dropdown}
+          </div>
+        </nav>
+        <div className="App-container">
+          
+          <section className={"App-info hero is-primary" + classMobileInfo}
+               style={this.getStyleInfo()}>
+            <div className="hero-body">
+              <h1 className="title">{this.state.selection == null?"":this.state.selection[NAME]}</h1>
+              {this.renderButton()}
+            </div>
+          </section>
+          <div className={"App-map-container" + classMobileMap}>
+            <Map 
+                className="App-map"
+                center={position} 
+                ref={map => { this.leafletMap = map; }} 
+                zoom={zoom} 
+                maxZoom={15} 
+                style={this.getStyleMap()}
+                minZoom={3}
+                onZoom={(e)=>this.handleBoundingBoxChange(e)} 
+                onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
+                <TileLayer
+                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
+                {geom}
+            </Map>
+          </div>
+          <aside className="App-list menu"
+               style={this.getStyleList()} >
+            <p class="menu-label">
+              Areas Naturales Protegidas
+            </p>
+            <ul className="menu-list">
+              {list}
+            </ul>
+          </aside>
         </div>
       </div>
     );
