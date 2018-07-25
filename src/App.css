@@ -14,13 +14,15 @@
 
 .App-info {
   position: absolute;
-  background: #ccc;
 }
 
 .App-list {
   position: absolute;
   overflow: scroll;
-  background: #ccc;
+}
+
+.li {
+  cursor: pointer;
 }
 
 .hide {
