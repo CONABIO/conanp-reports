@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
-import Responsive from 'react-responsive';
+//import Responsive from 'react-responsive';
 import { Map, TileLayer, GeoJSON } from 'react-leaflet';
 import * as turf from '@turf/turf';
-
-const Desktop = props => <Responsive {...props} minWidth={992} />;
 
 
 const breakpoints = {
@@ -12,12 +10,13 @@ const breakpoints = {
   tablet: 768
 };
 
+//const Desktop = props => <Responsive {...props} minWidth={992} />;
 //const Tablet = props => <Responsive {...props} minWidth={768} maxWidth={991} />;
 //const Mobile = props => <Responsive {...props} maxWidth={767} />;
 //const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
-const API = "http://127.0.0.1:8080/anps.geojson";
+const API = "http://172.16.13.194:8080/anps.geojson";
 const CODE = "ID_07";
 const NAME = "NOMBRE";
 
@@ -29,6 +28,7 @@ class App extends Component {
       ready: false,
       boundBox: null,
       selection: null,
+      showInfo: false
     };
   }
 
@@ -66,7 +66,7 @@ class App extends Component {
 
   clickToFeature(e) {
      let layer = e.target;
-     this.setState({selection:layer.feature.properties});
+     this.setState({selection:layer.feature.properties, showInfo:true});
   }
 
   getList() {
@@ -86,6 +86,10 @@ class App extends Component {
     this.getBoundingBoxFromMap();
   }
 
+  handleCloseInfo(event) {
+    this.setState({selection:null, showInfo:false});
+  }
+
   getBoundingBoxFromMap() {
     let bounds = this.leafletMap.leafletElement.getBounds();
     let boundBox = [bounds.getWest(), 
@@ -96,18 +100,26 @@ class App extends Component {
   }
 
   changeSelection(event){
-    let code = event.target.value;
+    let code = parseInt(event.target.value, 10);
+    console.log("The selected code is: " + code);
     let geojson = this.state.geojson;
-    let selection = {}
+    let selection = null;
+    let showInfo = false;
     if(geojson != null) {
       geojson.features.forEach(element => {
-        if(element.properties[CODE] == code){
+        if(element.properties[CODE] === code){
           selection = element.properties;
         }
       });
     }
+    console.log("The selection.");
     console.log(selection);
-    this.setState({selection: selection});
+
+    if(selection != null) {
+      showInfo = true;
+    }
+
+    this.setState({selection: selection, showInfo: showInfo});
   }
 
   getStyleInfo() {
@@ -128,10 +140,9 @@ class App extends Component {
               height: "100vh", 
               right: "0",
               left: "0",
-              top: "0",
+              top: "3vh",
               bottom: "0",
-              zIndex: "99",
-              transform: "translateX(100%)"};
+              zIndex: "99"};
     }
   }
 
@@ -146,10 +157,10 @@ class App extends Component {
               height:"50vh"};
     } else {
       return {width:"100vw", 
-              height:"100vh", 
+              height:"90vh", 
               right: "0",
               left: "0",
-              top: "0",
+              top: "10vh",
               bottom: "0"};
     }
   }
@@ -166,11 +177,30 @@ class App extends Component {
     }
   }
 
+  getDropDown() {
+    let slice = this.state.geojson;
+    console.log(slice);
+    let options = slice.features.map((element, index) => <option key={index} 
+                                             value={element.properties[CODE]}>{element.properties[NAME]}</option>);
+    return <select onChange={e=>this.changeSelection(e)}>{options}</select>;
+  }
+
+  renderButton(){
+    let button = null;
+    if(this.state.showInfo) {
+      button = <button onClick={e => this.handleCloseInfo(e)}>Cerrar</button>;
+    }
+    return button;
+  }
+
   render() {
     let geom = null;
     let list = null;
+    let dropdown = null;
     console.log("this.state.selection");
     console.log(this.state.selection);
+    let classMobileMap = "";
+    let classMobileInfo = "";
     if(this.state.ready) {
       console.log("I am ready to paint!");
       geom = <GeoJSON data={this.getGeoJson()} 
@@ -180,16 +210,30 @@ class App extends Component {
         console.log("Filtering list of polygons.");
         list = this.getList();
       }
+      if(!(window.innerWidth > breakpoints.tablet)) {
+        console.log("Building de dropdown.")
+        dropdown = this.getDropDown();
+        classMobileMap = (this.state.showInfo?" hide":"");
+        classMobileInfo = (this.state.showInfo?"":" hide");
+      }
     }
 
+
+
+
     return (
+
       <div className="App-container">
-        <div className="App-info"
+        <div className="App-Header">
+          {dropdown}
+        </div>
+        <div className={"App-info" + classMobileInfo}
              style={this.getStyleInfo()}>
           <h1>{this.state.selection == null?"":this.state.selection[NAME]}</h1>
+          {this.renderButton()}
         </div>
-        
-        <Map 
+        <div className={"App-map-container" + classMobileMap}>
+          <Map 
               className="App-map"
               center={position} 
               ref={map => { this.leafletMap = map; }} 
@@ -203,7 +247,8 @@ class App extends Component {
                 attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
                 url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
               {geom}
-        </Map>
+          </Map>
+        </div>
         <div className="App-list"
              style={this.getStyleList()} >
           <ul>

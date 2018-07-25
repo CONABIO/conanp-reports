@@ -6,8 +6,6 @@
 }
 
 .App-map-container{
-  position:absolute;
-  height: 100vh;
 }
 
 .App-map {
@@ -23,6 +21,10 @@
   position: absolute;
   overflow: scroll;
   background: #ccc;
+}
+
+.hide {
+  display: none;
 }
 
 
