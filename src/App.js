@@ -18,6 +18,8 @@ const breakpoints = {
 const position = [23.950464, -102.532867];
 const zoom = 5;
 const API = "http://127.0.0.1:8080/anps.geojson";
+const CODE = "ID_07";
+const NAME = "NOMBRE";
 
 class App extends Component {
   constructor(props) {
@@ -57,7 +59,6 @@ class App extends Component {
   }
 
   onEachFeature(feature, layer) {
-    console.log("On each feature call.");
     layer.on({
       click: this.clickToFeature.bind(this)
     });
@@ -75,7 +76,9 @@ class App extends Component {
                       let aux = turf.bboxPolygon(turf.bbox(element));
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     })
-                .map((element, index) => <li key={index}>{element.properties["NOMBRE"]}</li>);
+                .map((element, index) => <li key={index} 
+                                             value={element.properties[CODE]}
+                                             onClick={e => this.changeSelection(e)}>{element.properties[NAME]}</li>);
     return names;
   }
 
@@ -92,9 +95,61 @@ class App extends Component {
     this.setState({boundBox: boundBox});
   }
 
+  changeSelection(event){
+    let code = event.target.value;
+    let geojson = this.state.geojson;
+    let selection = {}
+    if(geojson != null) {
+      geojson.features.forEach(element => {
+        if(element.properties[CODE] == code){
+          selection = element.properties;
+        }
+      });
+    }
+    console.log(selection);
+    this.setState({selection: selection});
+  }
+
+  getStyleInfo() {
+    if(window.innerWidth > breakpoints.desktop) { 
+      return {width:"30vw", 
+              height:"100vh",
+              right: "0",
+              top: "0",
+              bottom: "0"}
+    } else {
+      return {width:"100vw", height:"50vh", bottom:"0"}
+    }
+  }
+
+  getStyleMap() {
+
+    if(window.innerWidth > breakpoints.desktop) { 
+      return {width:"50vw", 
+              height:"100vh",
+              left:"20vw"};
+    } else {
+      return {width:"100vw", height:"50vh"};
+    }
+  }
+
+  getStyleList() {
+    if(window.innerWidth > breakpoints.desktop) { 
+      return {width: "20vw", 
+              height: "100vh",
+              left: "0",
+              top: "0",
+              bottom: "0"};
+    } else {
+      return {display:"none"};
+    }
+  }
+
   render() {
     let geom = null;
     let list = null;
+    console.log("this.state.selection");
+    console.log(this.state.selection);
     if(this.state.ready) {
       console.log("I am ready to paint!");
       geom = <GeoJSON data={this.getGeoJson()} 
@@ -108,16 +163,18 @@ class App extends Component {
 
     return (
       <div className="App-container">
-        <div className={"App-info" + (this.state.infoIsActive? "": " is-inactive")}>
-          <h1>{this.state.selection == null?"":this.state.selection.NOMBRE}</h1>
+        <div className="App-info"
+             style={this.getStyleInfo()}>
+          <h1>{this.state.selection == null?"":this.state.selection[NAME]}</h1>
         </div>
-        <div>
-          <Map 
+        
+        <Map 
               className="App-map"
               center={position} 
               ref={map => { this.leafletMap = map; }} 
               zoom={zoom} 
               maxZoom={15} 
+              style={this.getStyleMap()}
               minZoom={3}
               onZoom={(e)=>this.handleBoundingBoxChange(e)} 
               onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
@@ -125,15 +182,13 @@ class App extends Component {
                 attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
                 url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
               {geom}
-          </Map>
+        </Map>
+        <div className="App-list"
+             style={this.getStyleList()} >
+          <ul>
+            {list}
+          </ul>
         </div>
-        <Desktop>
-          <div className={"App-list" + (this.state.listIsActive? "": " is-inactive")}>
-            <ul>
-              {list}
-            </ul>
-          </div>
-        </Desktop>
       </div>
     );
   }

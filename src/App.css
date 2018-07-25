@@ -8,48 +8,20 @@
 .App-map-container{
   position:absolute;
   height: 100vh;
-
-}
-
-.App-list-button {
-  position: absolute;
-  left:20px;
-  bottom:20px;
-  z-index: 10;
-}
-
-.App-info-button {
-  position: absolute;
-  right:20px;
-  bottom:20px;
-  z-index: 10;
 }
 
 .App-map {
-  width: 50%;
-  margin-left: 20vw;
-  height: 100vh;
 }
 
 .App-info {
   position: absolute;
-  width: 30%;
-  right:0;
-  top:0;
   background: #ccc;
-  height: 100vh;
 }
-
-
 
 .App-list {
   position: absolute;
-  width: 20%;
-  left:0;
   overflow: scroll;
-  top:0;
   background: #ccc;
-  height: 100vh;
 }
 
 
