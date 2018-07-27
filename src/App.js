@@ -18,8 +18,8 @@ const breakpoints = {
 const position = [23.950464, -102.532867];
 const zoom = 5;
 const API = "http://snmb.conabio.gob.mx/api_anps/v1/anps";
-const CODE = "ID_07";
-const NAME = "NOMBRE";
+const CODE = "id_07";
+const NAME = "nombre";
 
 class App extends Component {
   constructor(props) {
@@ -39,9 +39,9 @@ class App extends Component {
         return response.json();
       })
       .then(data => {
-        console.log(data);
+        console.log(data[0]);
 
-        this.setState({geojson:data,
+        this.setState({geojson:data[0],
                        ready:true});
         console.log(this.state.geojson);
         console.log(new Set(this.state.geojson.features.map(element=>element.properties["ID_07"]).sort()));
@@ -231,22 +231,27 @@ class App extends Component {
 
 
     if(this.state.selection != null){
-      /**
-      let polygon1 = turf.polygon([
+      
+      let polygon1 = turf.flip(turf.polygon([[
                            [90, -180],
                            [90, 180],
                            [-90, 180],
                            [-90, -180],
                            [90, -180]
-                        ]);
-      let polygon2 = this.state.selection.geometry;
-      console.log(turf.difference(polygon1, polygon2));
-      **/
-      anpSelected = <Polygon color="purple" positions={[[[90, -180],
-                                                        [90, 180],
-                                                        [-90, 180],
-                                                        [-90, -180],
-                                                        [90, -180]],[[0, 0], [11.72, -0.1], [21.52, -10.12], [0, 0]]]} />
+                        ]]));
+      let polygon2 = this.state.selection;
+      
+      console.log("Polygon 1");
+      console.log(polygon1);
+      console.log(turf.area(polygon1));
+      console.log("Polygon 2");
+      console.log(polygon2);
+      console.log(turf.area(polygon2));
+
+      let diff = turf.difference(polygon1, polygon2);
+      console.log("Diff polygon.");
+      console.log(diff);
+      anpSelected = <Polygon color="purple" positions={turf.flip(diff).geometry.coordinates} />
       console.log(anpSelected);
       geom = null;
     }
