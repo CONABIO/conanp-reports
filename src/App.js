@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 //import Responsive from 'react-responsive';
-import { Map, TileLayer, GeoJSON } from 'react-leaflet';
+import { Map, TileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
@@ -17,7 +17,7 @@ const breakpoints = {
 //const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
-const API = "http://172.16.13.194:8080/anps.geojson";
+const API = "http://snmb.conabio.gob.mx/api_anps/v1/anps";
 const CODE = "ID_07";
 const NAME = "NOMBRE";
 
@@ -39,6 +39,8 @@ class App extends Component {
         return response.json();
       })
       .then(data => {
+        console.log(data);
+
         this.setState({geojson:data,
                        ready:true});
         console.log(this.state.geojson);
@@ -67,7 +69,7 @@ class App extends Component {
 
   clickToFeature(e) {
      let layer = e.target;
-     this.setState({selection:layer.feature.properties, showInfo:true});
+     this.setState({selection:layer.feature, showInfo:true});
   }
 
   getList() {
@@ -78,8 +80,8 @@ class App extends Component {
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     })
                 .map((element, index) => <li key={index} 
-                                             value={element.properties[CODE]}
-                                             onClick={e => this.changeSelection(e)}><a>{element.properties[NAME]}</a></li>);
+                                             onClick={e => this.changeSelection(e)}
+                                             value={element.properties[CODE]} >{element.properties[NAME]}</li>);
     return names;
   }
 
@@ -101,6 +103,8 @@ class App extends Component {
   }
 
   changeSelection(event){
+    console.log(event.target);
+
     let code = parseInt(event.target.value, 10);
     console.log("The selected code is: " + code);
     let geojson = this.state.geojson;
@@ -109,7 +113,7 @@ class App extends Component {
     if(geojson != null) {
       geojson.features.forEach(element => {
         if(element.properties[CODE] === code){
-          selection = element.properties;
+          selection = element;
         }
       });
     }
@@ -118,6 +122,7 @@ class App extends Component {
 
     if(selection != null) {
       showInfo = true;
+      console.log(selection);
     }
 
     this.setState({selection: selection, showInfo: showInfo});
@@ -198,8 +203,13 @@ class App extends Component {
     let geom = null;
     let list = null;
     let dropdown = null;
+    let anpSelected = null;
     console.log("this.state.selection");
     console.log(this.state.selection);
+
+
+
+
     let classMobileMap = "";
     let classMobileInfo = "";
     if(this.state.ready) {
@@ -220,6 +230,27 @@ class App extends Component {
     }
 
 
+    if(this.state.selection != null){
+      /**
+      let polygon1 = turf.polygon([
+                           [90, -180],
+                           [90, 180],
+                           [-90, 180],
+                           [-90, -180],
+                           [90, -180]
+                        ]);
+      let polygon2 = this.state.selection.geometry;
+      console.log(turf.difference(polygon1, polygon2));
+      **/
+      anpSelected = <Polygon color="purple" positions={[[[90, -180],
+                                                        [90, 180],
+                                                        [-90, 180],
+                                                        [-90, -180],
+                                                        [90, -180]],[[0, 0], [11.72, -0.1], [21.52, -10.12], [0, 0]]]} />
+      console.log(anpSelected);
+      geom = null;
+    }
+
 
 
     return (
@@ -236,7 +267,7 @@ class App extends Component {
           <section className={"App-info hero is-primary" + classMobileInfo}
                style={this.getStyleInfo()}>
             <div className="hero-body">
-              <h1 className="title">{this.state.selection == null?"":this.state.selection[NAME]}</h1>
+              <h1 className="title">{this.state.selection == null?"":this.state.selection.properties[NAME]}</h1>
               {this.renderButton()}
             </div>
           </section>
@@ -255,11 +286,12 @@ class App extends Component {
                   attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
                   url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
                 {geom}
+                {anpSelected}
             </Map>
           </div>
           <aside className="App-list menu"
                style={this.getStyleList()} >
-            <p class="menu-label">
+            <p className="menu-label">
               Areas Naturales Protegidas
             </p>
             <ul className="menu-list">
