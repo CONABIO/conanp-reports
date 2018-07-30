@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+import List from './List.js';
+import Dropdown from './Dropdown.js';
 //import Responsive from 'react-responsive';
 import { Map, TileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
@@ -17,9 +19,9 @@ const breakpoints = {
 //const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
-const API = "http://snmb.conabio.gob.mx/api_anps/v1/anps";
-const CODE = "id_07";
-const NAME = "nombre";
+const API = "http://127.0.0.1:8080/anps.geojson";
+const CODE = "ID_07";
+const NAME = "NOMBRE";
 
 class App extends Component {
   constructor(props) {
@@ -39,12 +41,12 @@ class App extends Component {
         return response.json();
       })
       .then(data => {
-        console.log(data[0]);
+        console.log(data);
 
-        this.setState({geojson:data[0],
+        this.setState({geojson:data,
                        ready:true});
         console.log(this.state.geojson);
-        console.log(new Set(this.state.geojson.features.map(element=>element.properties["ID_07"]).sort()));
+        console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
       });
     this.getBoundingBoxFromMap();
   }
@@ -75,14 +77,23 @@ class App extends Component {
   getList() {
     let slice = this.state.geojson;
     let boundBoxPolygon = turf.bboxPolygon(this.state.boundBox);
-    let names = slice.features.filter(element => {
+    let options = slice.features.filter(element => {
                       let aux = turf.bboxPolygon(turf.bbox(element));
                       return turf.intersect(boundBoxPolygon, aux) != null;
-                    })
-                .map((element, index) => <li key={index} 
-                                             onClick={e => this.changeSelection(e)}
-                                             value={element.properties[CODE]} >{element.properties[NAME]}</li>);
-    return names;
+                    });
+    
+    return <List anps={options}
+                 code={CODE}
+                 name={NAME}
+                 handleClick={e => this.changeSelection(e)} />
+  }
+
+  getDropDown() {
+    let slice = this.state.geojson;
+    return <Dropdown anps={slice.features}
+                     code={CODE}
+                     name={NAME}
+                     handleClick={e => this.changeSelection(e)} />
   }
 
   handleBoundingBoxChange(event) {
@@ -103,10 +114,7 @@ class App extends Component {
   }
 
   changeSelection(event){
-    console.log(event.target);
-
     let code = parseInt(event.target.value, 10);
-    console.log("The selected code is: " + code);
     let geojson = this.state.geojson;
     let selection = null;
     let showInfo = false;
@@ -117,28 +125,23 @@ class App extends Component {
         }
       });
     }
-    console.log("The selection.");
-    console.log(selection);
-
     if(selection != null) {
       showInfo = true;
-      console.log(selection);
     }
-
     this.setState({selection: selection, showInfo: showInfo});
   }
 
   getStyleInfo() {
     if(window.innerWidth > breakpoints.desktop) { 
-      return {width:"30vw", 
-              height:"100vh",
+      return {width: "30vw", 
+              height: "100vh",
               right: "0",
               top: "0",
               bottom: "0"}
     } else if(window.innerWidth > breakpoints.tablet){
-      return {width:"100vw", 
-              height:"50vh", 
-              bottom:"0"}
+      return {width: "100vw", 
+              height: "50vh", 
+              bottom: "0"}
     } else {
       console.log("mobile");
       return {position: "fixed",
@@ -155,15 +158,15 @@ class App extends Component {
   getStyleMap() {
     console.log(window.innerWidth);
     if(window.innerWidth > breakpoints.desktop) { 
-      return {width:"50vw", 
-              height:"100vh",
-              left:"20vw"};
+      return {width: "50vw", 
+              height: "100vh",
+              left: "20vw"};
     } else if(window.innerWidth > breakpoints.tablet){
-      return {width:"100vw", 
-              height:"50vh"};
+      return {width: "100vw", 
+              height: "50vh"};
     } else {
-      return {width:"100vw", 
-              height:"90vh", 
+      return {width: "100vw", 
+              height: "90vh", 
               right: "0",
               left: "0",
               top: "10vh",
@@ -183,13 +186,7 @@ class App extends Component {
     }
   }
 
-  getDropDown() {
-    let slice = this.state.geojson;
-    console.log(slice);
-    let options = slice.features.map((element, index) => <option key={index} 
-                                             value={element.properties[CODE]}>{element.properties[NAME]}</option>);
-    return <select className="navbar-item" onChange={e=>this.changeSelection(e)}>{options}</select>;
-  }
+
 
   renderButton(){
     let button = null;
@@ -251,8 +248,9 @@ class App extends Component {
       let diff = turf.difference(polygon1, polygon2);
       console.log("Diff polygon.");
       console.log(diff);
-      anpSelected = <Polygon color="purple" positions={turf.flip(diff).geometry.coordinates} />
+      anpSelected = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
       console.log(anpSelected);
+
       geom = null;
     }
 
@@ -260,8 +258,7 @@ class App extends Component {
 
     return (
       <div>
-        <nav className="navbar" 
-             role="navigation" aria-label="main navigation">
+        <nav className="navbar" aria-label="main navigation">
           <div className="navbar-brand">
             <a className="navbar-item">Reportes CONANP</a>
             {dropdown}
@@ -299,9 +296,9 @@ class App extends Component {
             <p className="menu-label">
               Areas Naturales Protegidas
             </p>
-            <ul className="menu-list">
-              {list}
-            </ul>
+
+            
+            {list}
           </aside>
         </div>
       </div>
