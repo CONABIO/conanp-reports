@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 
+const breakpoints = {
+  desktop: 992,
+  tablet: 768
+};
+
 export default class List extends Component {
 
     constructor(props) {
       super(props);
       this.handleClick = this.props.handleClick;
     }
+
+
 
     render() {
       const code = this.props.code;

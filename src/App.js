@@ -135,9 +135,8 @@ class App extends Component {
   getStyleMap() {
     console.log(window.innerWidth);
     if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "50vw", 
-              height: "100vh",
-              left: "20vw"};
+      return {width: "60vw", 
+              height: "100vh"};
     } else if(window.innerWidth > breakpoints.tablet){
       return {width: "100vw", 
               height: "50vh"};
@@ -153,9 +152,9 @@ class App extends Component {
 
   getStyleList() {
     if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "20vw", 
+      return {width: "40vw", 
               height: "100vh",
-              left: "0",
+              right: "0",
               top: "0",
               bottom: "0"};
     } else {
@@ -164,17 +163,17 @@ class App extends Component {
   }
 
   render() {
-    let geom = null;
+    let geoJsonLayer = null;
     let list = null;
     let dropdown = null;
-    let anpSelected = null;
-    console.log("this.state.selection");
-    console.log(this.state.selection);
+    let selectedAnp = null;
+    let rightContent = null;
     let classMobileMap = "";
     let classMobileInfo = "";
+
+
     if(this.state.ready) {
-      console.log("I am ready to paint!");
-      geom = <GeoJSON data={this.getGeoJson()} 
+      geoJsonLayer = <GeoJSON data={this.getGeoJson()} 
                       style={this.getStyle} 
                       onEachFeature={this.onEachFeature.bind(this)} />
       if(window.innerWidth > breakpoints.desktop) {
@@ -188,10 +187,7 @@ class App extends Component {
         classMobileInfo = (this.state.showInfo?"":" hide");
       }
     }
-
-
     if(this.state.selection != null){
-      
       let polygon1 = turf.flip(turf.polygon([[
                            [90, -180],
                            [90, 180],
@@ -200,24 +196,24 @@ class App extends Component {
                            [90, -180]
                         ]]));
       let polygon2 = this.state.selection;
-      
-      console.log("Polygon 1");
-      console.log(polygon1);
-      console.log(turf.area(polygon1));
-      console.log("Polygon 2");
-      console.log(polygon2);
-      console.log(turf.area(polygon2));
-
       let diff = turf.difference(polygon1, polygon2);
-      console.log("Diff polygon.");
-      console.log(diff);
-      anpSelected = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
-      console.log(anpSelected);
-
-      geom = null;
+      selectedAnp = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
+      rightContent = <Content classMobileInfo={classMobileInfo}
+                              selection={this.state.selection}
+                              name={NAME}
+                              handleClick={e=>this.handleCloseInfo(e)}
+                              showInfo={this.state.showInfo}
+                              />
+      geoJsonLayer = null;
+    } else {
+      rightContent = <aside className="App-list menu"
+                          style={this.getStyleList()} >
+                       <p className="menu-label">
+                         Areas Naturales Protegidas
+                       </p>
+                       {list}
+                     </aside>
     }
-
-
 
     return (
       <div>
@@ -228,12 +224,9 @@ class App extends Component {
           </div>
         </nav>
         <div className="App-container">
-          <Content classMobileInfo={classMobileInfo}
-                   selection={this.state.selection}
-                   name={NAME}
-                   handleClick={e=>this.handleCloseInfo(e)}
-                   showInfo={this.state.showInfo}
-                   />
+          <div className="App-aside">
+            {rightContent}
+          </div>
           <div className={"App-map-container" + classMobileMap}>
             <Map 
                 className="App-map"
@@ -248,19 +241,10 @@ class App extends Component {
                 <TileLayer
                   attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
                   url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
-                {geom}
-                {anpSelected}
+                {geoJsonLayer}
+                {selectedAnp}
             </Map>
           </div>
-          <aside className="App-list menu"
-               style={this.getStyleList()} >
-            <p className="menu-label">
-              Areas Naturales Protegidas
-            </p>
-
-            
-            {list}
-          </aside>
         </div>
       </div>
     );

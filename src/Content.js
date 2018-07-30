@@ -14,7 +14,7 @@ export default class Dropdown extends Component {
   
   getStyleInfo() {
     if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "30vw", 
+      return {width: "40vw", 
               height: "100vh",
               right: "0",
               top: "0",
