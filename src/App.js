@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import List from './List.js';
 import Dropdown from './Dropdown.js';
+import Content from './Content.js';
 //import Responsive from 'react-responsive';
 import { Map, TileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
@@ -131,30 +132,6 @@ class App extends Component {
     this.setState({selection: selection, showInfo: showInfo});
   }
 
-  getStyleInfo() {
-    if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "30vw", 
-              height: "100vh",
-              right: "0",
-              top: "0",
-              bottom: "0"}
-    } else if(window.innerWidth > breakpoints.tablet){
-      return {width: "100vw", 
-              height: "50vh", 
-              bottom: "0"}
-    } else {
-      console.log("mobile");
-      return {position: "fixed",
-              width: "100vw", 
-              height: "100vh", 
-              right: "0",
-              left: "0",
-              top: "3vh",
-              bottom: "0",
-              zIndex: "99"};
-    }
-  }
-
   getStyleMap() {
     console.log(window.innerWidth);
     if(window.innerWidth > breakpoints.desktop) { 
@@ -186,16 +163,6 @@ class App extends Component {
     }
   }
 
-
-
-  renderButton(){
-    let button = null;
-    if(this.state.showInfo) {
-      button = <button onClick={e => this.handleCloseInfo(e)}>Cerrar</button>;
-    }
-    return button;
-  }
-
   render() {
     let geom = null;
     let list = null;
@@ -203,10 +170,6 @@ class App extends Component {
     let anpSelected = null;
     console.log("this.state.selection");
     console.log(this.state.selection);
-
-
-
-
     let classMobileMap = "";
     let classMobileInfo = "";
     if(this.state.ready) {
@@ -265,14 +228,12 @@ class App extends Component {
           </div>
         </nav>
         <div className="App-container">
-          
-          <section className={"App-info hero is-primary" + classMobileInfo}
-               style={this.getStyleInfo()}>
-            <div className="hero-body">
-              <h1 className="title">{this.state.selection == null?"":this.state.selection.properties[NAME]}</h1>
-              {this.renderButton()}
-            </div>
-          </section>
+          <Content classMobileInfo={classMobileInfo}
+                   selection={this.state.selection}
+                   name={NAME}
+                   handleClick={e=>this.handleCloseInfo(e)}
+                   showInfo={this.state.showInfo}
+                   />
           <div className={"App-map-container" + classMobileMap}>
             <Map 
                 className="App-map"
