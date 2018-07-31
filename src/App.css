@@ -21,10 +21,6 @@
   overflow: scroll;
 }
 
-.li {
-  cursor: pointer;
-}
-
 .hide {
   display: none;
 }
