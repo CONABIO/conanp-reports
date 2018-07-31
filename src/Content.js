@@ -38,7 +38,7 @@ export default class Dropdown extends Component {
   }
 
   render() {
-      return <article className={"App-info message is-info" + this.props.classMobileInfo}
+      return <article className={"App-info message is-info"}
                       style={this.getStyleInfo()}>
                <div className="message-header">
                  {this.props.selection == null?"":this.props.selection.properties[NAME]}
