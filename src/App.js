@@ -4,11 +4,13 @@ import List from './List.js';
 import Dropdown from './Dropdown.js';
 import Content from './Content.js';
 //import Responsive from 'react-responsive';
-import { Map, TileLayer, GeoJSON, Polygon } from 'react-leaflet';
+import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
 import { breakpoints, CODE, NAME, API } from './util.js';
+
+const { BaseLayer, Overlay } = LayersControl;
 
 //const Desktop = props => <Responsive {...props} minWidth={992} />;
 //const Tablet = props => <Responsive {...props} minWidth={768} maxWidth={991} />;
@@ -37,8 +39,8 @@ class App extends Component {
       .then(data => {
         this.setState({geojson: data,
                        ready: true});
-        console.log(this.state.geojson);
-        console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
+        //console.log(this.state.geojson);
+        //console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
       });
     this.getBoundingBoxFromMap();
   }
@@ -49,9 +51,9 @@ class App extends Component {
 
   getStyle(feature, layer) {
     return {
-      color: '#006400',
+      color: 'black',
       weight: 1,
-      opacity: 0.65
+      opacity: 0.9
     }
   }
 
@@ -103,12 +105,17 @@ class App extends Component {
 
   changeSelection(event){
     let code = parseInt(event.target.value, 10);
+    this.changeSelectionHelper(code);
+
+  }
+
+  changeSelectionHelper(newSelection) {
     let geojson = this.state.geojson;
     let selection = null;
     let showInfo = false;
     if(geojson != null) {
       geojson.features.forEach(element => {
-        if(element.properties[CODE] === code){
+        if(element.properties[CODE] === newSelection){
           selection = element;
         }
       });
@@ -145,10 +152,34 @@ class App extends Component {
                 minZoom={3}
                 onZoom={(e)=>this.handleBoundingBoxChange(e)} 
                 onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
+              <LayersControl position="topright">
                 <TileLayer
-                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
+                      attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                      url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
+                <BaseLayer checked name="None">
+                    <TileLayer
+                      attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                      url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
+                </BaseLayer>
+                <BaseLayer checked name="Integridad Ecológica">
+                    <WMSTileLayer
+                      transparent
+                      format='image/png'
+                      layers='MEX_IE3C_250m:ie3c_2014_250m'
+                      attribution='CONABIO'
+                      url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_IE3C_250m/wms?' />
+                </BaseLayer>
+                <BaseLayer checked name="Cobertura de Suelo">
+                    <WMSTileLayer
+                      transparent
+                      format='image/png'
+                      layers='MEX_LC_Landsat_8C:MEX_LC_2015_Landsat_8C'
+                      attribution='CONABIO'
+                      url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_LC_Landsat_8C/wms?' />
+                </BaseLayer>
                 {content}
+              </LayersControl>
+                
             </Map>;
   }
 
@@ -160,8 +191,6 @@ class App extends Component {
     let selectedAnp = null;
     let rightContent = null;
     let mainContent = this.getMap(null);
-    let classMobileMap = "";
-    let classMobileInfo = "";
 
     if(this.state.ready) {
       geoJsonLayer = <GeoJSON data={this.getGeoJson()} 
@@ -180,9 +209,10 @@ class App extends Component {
                             ]]));
           let polygon2 = this.state.selection;
           let diff = turf.difference(polygon1, polygon2);
-          selectedAnp = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
-          rightContent = <Content classMobileInfo={classMobileInfo}
-                                  selection={this.state.selection}
+          selectedAnp = <Polygon color="black"
+                                 fillOpacity={.9}
+                                 positions={turf.flip(diff).geometry.coordinates} />
+          rightContent = <Content selection={this.state.selection}
                                   handleClick={e=>this.handleCloseInfo(e)}
                                   showInfo={this.state.showInfo}
                                   />
@@ -196,13 +226,10 @@ class App extends Component {
       if(!(window.innerWidth > breakpoints.tablet)) {
         console.log("Mobile.");
         dropdown = this.getDropDown();
-        classMobileMap = (this.state.showInfo?" hide":"");
-        classMobileInfo = (this.state.showInfo?"":" hide");
         if(this.state.selection != null) {
-          mainContent = <Content classMobileInfo={classMobileInfo}
-                                  selection={this.state.selection}
-                                  handleClick={e=>this.handleCloseInfo(e)}
-                                  showInfo={this.state.showInfo}
+          mainContent = <Content selection={this.state.selection}
+                                 handleClick={e=>this.handleCloseInfo(e)}
+                                 showInfo={this.state.showInfo}
                                   />
         } else {
           mainContent = this.getMap(geoJsonLayer);
