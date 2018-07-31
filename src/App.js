@@ -35,7 +35,7 @@ class App extends Component {
         return response.json();
       })
       .then(data => {
-        this.setState({geojson: data[0],
+        this.setState({geojson: data,
                        ready: true});
         console.log(this.state.geojson);
         console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
@@ -216,7 +216,7 @@ class App extends Component {
         <nav className="navbar" aria-label="main navigation">
           <div className="navbar-brand">
             <a className="navbar-item">Reportes CONANP</a>
-            {dropdown}
+            <span className="navbar-item">{dropdown}</span>
           </div>
         </nav>
         <div className="App-container">

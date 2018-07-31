@@ -12,7 +12,8 @@ export default class Dropdown extends Component {
     render() {
       const anps = this.props.anps.map((element, index) => <option key={index} 
                                                                    value={element.properties[CODE]}>{element.properties[NAME]}</option>);
-      return <select className="navbar-item" 
-                     onChange={e=>this.handleClick(e)}>{anps}</select>;
+      return <div className="select">
+               <select onChange={e=>this.handleClick(e)}>{anps}</select>
+             </div>;
     }
 }
