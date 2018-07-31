@@ -8,11 +8,7 @@ import { Map, TileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
-
-const breakpoints = {
-  desktop: 992,
-  tablet: 768
-};
+import { breakpoints, CODE, NAME, API } from './util.js';
 
 //const Desktop = props => <Responsive {...props} minWidth={992} />;
 //const Tablet = props => <Responsive {...props} minWidth={768} maxWidth={991} />;
@@ -20,9 +16,6 @@ const breakpoints = {
 //const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
-const API = "http://127.0.0.1:8080/anps.geojson";
-const CODE = "ID_07";
-const NAME = "NOMBRE";
 
 class App extends Component {
   constructor(props) {
@@ -42,10 +35,8 @@ class App extends Component {
         return response.json();
       })
       .then(data => {
-        console.log(data);
-
-        this.setState({geojson:data,
-                       ready:true});
+        this.setState({geojson: data[0],
+                       ready: true});
         console.log(this.state.geojson);
         console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
       });
@@ -84,16 +75,12 @@ class App extends Component {
                     });
     
     return <List anps={options}
-                 code={CODE}
-                 name={NAME}
                  handleClick={e => this.changeSelection(e)} />
   }
 
   getDropDown() {
     let slice = this.state.geojson;
     return <Dropdown anps={slice.features}
-                     code={CODE}
-                     name={NAME}
                      handleClick={e => this.changeSelection(e)} />
   }
 
@@ -141,26 +128,30 @@ class App extends Component {
       return {width: "100vw", 
               height: "50vh"};
     } else {
-      return {width: "100vw", 
-              height: "90vh", 
-              right: "0",
+      return {right: "0",
               left: "0",
-              top: "10vh",
+              top: "0",
               bottom: "0"};
     }
   }
 
-  getStyleList() {
-    if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "40vw", 
-              height: "100vh",
-              right: "0",
-              top: "0",
-              bottom: "0"};
-    } else {
-      return {display:"none"};
-    }
+  getMap(content){
+    return <Map className="App-map"
+                center={position} 
+                ref={map => { this.leafletMap = map; }} 
+                zoom={zoom} 
+                maxZoom={15} 
+                style={this.getStyleMap()}
+                minZoom={3}
+                onZoom={(e)=>this.handleBoundingBoxChange(e)} 
+                onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
+                <TileLayer
+                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
+                {content}
+            </Map>;
   }
+
 
   render() {
     let geoJsonLayer = null;
@@ -168,51 +159,56 @@ class App extends Component {
     let dropdown = null;
     let selectedAnp = null;
     let rightContent = null;
+    let mainContent = this.getMap(null);
     let classMobileMap = "";
     let classMobileInfo = "";
 
-
     if(this.state.ready) {
       geoJsonLayer = <GeoJSON data={this.getGeoJson()} 
-                      style={this.getStyle} 
-                      onEachFeature={this.onEachFeature.bind(this)} />
-      if(window.innerWidth > breakpoints.desktop) {
-        console.log("Filtering list of polygons.");
+                              style={this.getStyle} 
+                              onEachFeature={this.onEachFeature.bind(this)} />
+      if(window.innerWidth >= breakpoints.tablet) {
+        console.log("Not mobile.");
         list = this.getList();
+        if(this.state.selection != null){
+          let polygon1 = turf.flip(turf.polygon([[
+                               [90, -180],
+                               [90, 180],
+                               [-90, 180],
+                               [-90, -180],
+                               [90, -180]
+                            ]]));
+          let polygon2 = this.state.selection;
+          let diff = turf.difference(polygon1, polygon2);
+          selectedAnp = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
+          rightContent = <Content classMobileInfo={classMobileInfo}
+                                  selection={this.state.selection}
+                                  handleClick={e=>this.handleCloseInfo(e)}
+                                  showInfo={this.state.showInfo}
+                                  />
+          mainContent = this.getMap(selectedAnp);
+        } else {
+          console.log("This is the content for a tablet or desktop.");
+          rightContent = this.getList();
+          mainContent = this.getMap(geoJsonLayer);
+        }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
-        console.log("Building de dropdown.")
+        console.log("Mobile.");
         dropdown = this.getDropDown();
         classMobileMap = (this.state.showInfo?" hide":"");
         classMobileInfo = (this.state.showInfo?"":" hide");
+        if(this.state.selection != null) {
+          mainContent = <Content classMobileInfo={classMobileInfo}
+                                  selection={this.state.selection}
+                                  handleClick={e=>this.handleCloseInfo(e)}
+                                  showInfo={this.state.showInfo}
+                                  />
+        } else {
+          mainContent = this.getMap(geoJsonLayer);
+        }
+        
       }
-    }
-    if(this.state.selection != null){
-      let polygon1 = turf.flip(turf.polygon([[
-                           [90, -180],
-                           [90, 180],
-                           [-90, 180],
-                           [-90, -180],
-                           [90, -180]
-                        ]]));
-      let polygon2 = this.state.selection;
-      let diff = turf.difference(polygon1, polygon2);
-      selectedAnp = <Polygon color="black" positions={turf.flip(diff).geometry.coordinates} />
-      rightContent = <Content classMobileInfo={classMobileInfo}
-                              selection={this.state.selection}
-                              name={NAME}
-                              handleClick={e=>this.handleCloseInfo(e)}
-                              showInfo={this.state.showInfo}
-                              />
-      geoJsonLayer = null;
-    } else {
-      rightContent = <aside className="App-list menu"
-                          style={this.getStyleList()} >
-                       <p className="menu-label">
-                         Areas Naturales Protegidas
-                       </p>
-                       {list}
-                     </aside>
     }
 
     return (
@@ -227,23 +223,8 @@ class App extends Component {
           <div className="App-aside">
             {rightContent}
           </div>
-          <div className={"App-map-container" + classMobileMap}>
-            <Map 
-                className="App-map"
-                center={position} 
-                ref={map => { this.leafletMap = map; }} 
-                zoom={zoom} 
-                maxZoom={15} 
-                style={this.getStyleMap()}
-                minZoom={3}
-                onZoom={(e)=>this.handleBoundingBoxChange(e)} 
-                onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
-                <TileLayer
-                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
-                {geoJsonLayer}
-                {selectedAnp}
-            </Map>
+          <div className={"App-map-container"}>
+            {mainContent}
           </div>
         </div>
       </div>

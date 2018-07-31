@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 
-const breakpoints = {
-  desktop: 992,
-  tablet: 768
-};
+import { breakpoints, CODE, NAME, API } from './util.js';
 
 export default class Dropdown extends Component {
   
@@ -13,6 +10,7 @@ export default class Dropdown extends Component {
   }
   
   getStyleInfo() {
+    console.log("This is the style info.")
     if(window.innerWidth > breakpoints.desktop) { 
       return {width: "40vw", 
               height: "100vh",
@@ -20,37 +18,35 @@ export default class Dropdown extends Component {
               top: "0",
               bottom: "0"}
     } else if(window.innerWidth > breakpoints.tablet){
+
+      console.log("tablet from content");
       return {width: "100vw", 
               height: "50vh", 
               bottom: "0"}
     } else {
       console.log("mobile");
-      return {position: "fixed",
-              width: "100vw", 
-              height: "100vh", 
-              right: "0",
-              left: "0",
-              top: "3vh",
-              bottom: "0",
-              zIndex: "99"};
+      return {};
     }
   }
 
   renderButton(){
     let button = null;
     if(this.props.showInfo) {
-      button = <button onClick={e => this.handleClick(e)}>Cerrar</button>;
+      button = <button className="delete" onClick={e => this.handleClick(e)}></button>;
     }
     return button;
   }
 
   render() {
-      return <section className={"App-info hero is-primary" + this.props.classMobileInfo}
-                    style={this.getStyleInfo()}>
-                 <div className="hero-body">
-                   <h1 className="title">{this.props.selection == null?"":this.props.selection.properties[this.props.name]}</h1>
-                   {this.renderButton()}
-                 </div>
-             </section>
+      return <article className={"App-info message is-info" + this.props.classMobileInfo}
+                      style={this.getStyleInfo()}>
+               <div className="message-header">
+                 {this.props.selection == null?"":this.props.selection.properties[NAME]}
+                 {this.renderButton()}
+               </div>
+               <div className="message-body max-height">
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque risus mi, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum felis venenatis efficitur. Aenean ac eleifend lacus, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
+               </div>
+             </article>
   }
 }
