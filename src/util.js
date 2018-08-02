@@ -3,11 +3,24 @@ const breakpoints = {
   tablet: 768
 };
 
-const API = "http://127.0.0.1:8080/anps.geojson";
-//const API = "http://snmb.conabio.gob.mx/api_anps/v1/anps"
-const CODE = "ID_07";
-//const CODE = "id_07";
-const NAME = "NOMBRE";
-//const NAME = "nombre";
+const ANPS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/anps";
+const KERNELS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/nucleos";
+const RINGS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/anillos";
+const REGIONS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/regiones";
+const PRESERVATIONS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/preservaciones";
 
-export { breakpoints, API, CODE, NAME };
+const REGIONS_CODE = "objectid";
+const CODE = "id_07";
+const REGIONS_NAME = "region";
+const NAME = "nombre";
+
+export { breakpoints,
+         ANPS_URL,
+         KERNELS_URL,
+         RINGS_URL,
+         REGIONS_URL,
+         PRESERVATIONS_URL,
+         REGIONS_CODE, 
+         REGIONS_NAME,
+         CODE, 
+         NAME };
