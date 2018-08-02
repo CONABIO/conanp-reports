@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { breakpoints, CODE, NAME, ANPS_URL } from './util.js';
+import { breakpoints, NAME } from './util.js';
 
 export default class Dropdown extends Component {
   
