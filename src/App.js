@@ -4,14 +4,11 @@ import List from './List.js';
 import Dropdown from './Dropdown.js';
 import Overview from './Overview.js';
 import Content from './Content.js';
-//import Responsive from 'react-responsive';
-import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
+import { Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
-import { breakpoints, CODE, NAME, PRESERVATIONS_URL, ANPS_URL, KERNELS_URL, RINGS_URL, REGIONS_URL } from './util.js';
-
-const { BaseLayer, Overlay } = LayersControl;
+import { breakpoints, loadUrl, CODE, ANPS_URL } from './util.js';
 
 const position = [23.950464, -102.532867];
 const zoom = 5;
@@ -33,30 +30,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.loadUrl(ANPS_URL, this.setAnp.bind(this));
-    //this.loadUrl(KERNELS_URL, this.setKernel.bind(this));
-    //this.loadUrl(REGIONS_URL, this.setRegion.bind(this));
-    //this.loadUrl(RINGS_URL, this.setRing.bind(this));
-    //this.loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
-    //this.getBoundingBoxFromMap();
-  }
-
-  loadUrl(url, callback) {
-    console.log("Loading url.")
-    fetch(url,{
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        mode: "cors", // no-cors, cors, *same-origin
-        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            "Accept-Encoding": "gzip,deflate",
-        }})
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        callback(data[0]);
-    });
+    loadUrl(ANPS_URL, this.setAnp.bind(this));
+    //loadUrl(KERNELS_URL, this.setKernel.bind(this));
+    //loadUrl(REGIONS_URL, this.setRegion.bind(this));
+    //loadUrl(RINGS_URL, this.setRing.bind(this));
+    //loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
   }
 
   setAnp(data){
@@ -83,7 +61,7 @@ class App extends Component {
     return this.state.anp != null ;
   }
 
-  getGeoJson() {
+  getAnp() {
     return this.state.anp;
   }
 
@@ -113,7 +91,6 @@ class App extends Component {
       }
   }
 
-
   onEachFeature(feature, layer) {
     layer.on({
       click: this.clickToFeature.bind(this)
@@ -128,11 +105,6 @@ class App extends Component {
   getList() {
     let slice = this.state.anp;
     let bounds = this.state.boundBox;
-
-    console.log("From get list");
-    console.log(bounds);
-
-
     let boundBox = [bounds.getWest(), 
                     bounds.getNorth(), 
                     bounds.getEast(), 
@@ -153,24 +125,12 @@ class App extends Component {
                      handleClick={e => this.changeSelection(e)} />
   }
 
-  handleBoundingBoxChange(event) {
-    this.getBoundingBoxFromMap();
-  }
-
   handleCloseInfo(event) {
     this.setState({selection:null, showInfo:false});
-    let leafletBbox = this.state.boundBox;
-    this.leafletMap.leafletElement.fitBounds(leafletBbox);
+    //let leafletBbox = this.state.boundBox;
+    //this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
 
-  getBoundingBoxFromMap() {
-    let selection =  this.state.selection;
-    if(selection == null) {
-      let bounds = this.leafletMap.leafletElement.getBounds();
-      this.setState({boundBox: bounds});
-    }
-
-  }
 
   changeBounds(bounds){
     console.log("The bounds are " + bounds)
@@ -202,112 +162,22 @@ class App extends Component {
     this.setState({selection: selection, showInfo: showInfo});
   }
 
-  getStyleMap() {
-    console.log(window.innerWidth);
-    if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "60vw", 
-              height: "100vh"};
-    } else if(window.innerWidth > breakpoints.tablet){
-      return {width: "100vw", 
-              height: "50vh"};
-    } else {
-      return {right: "0",
-              left: "0",
-              top: "0",
-              bottom: "0"};
-    }
-  }
-
-  getMap(content){
-
-    let anpLayer = null;
-    let ringLayer = null;
-    let kernelLayer = null;
-    let regionLayer = null;
-    let preservationLayer = null;
-
-    if(content != null) { 
-      //anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer
-      anpLayer = content[0];
-      regionLayer = content[1];
-      ringLayer = content[2];
-      preservationLayer = content[3];
-      kernelLayer = content[4];
-    }
-    
-
-    return <Map className="App-map"
-                center={position} 
-                ref={map => { this.leafletMap = map; }} 
-                zoom={zoom} 
-                maxZoom={15} 
-                style={this.getStyleMap()}
-                minZoom={3}
-                onZoom={(e)=>this.handleBoundingBoxChange(e)} 
-                onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
-              <LayersControl position="topright">
-                <TileLayer
-                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
-                <BaseLayer name="None">
-                    <TileLayer
-                      attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                      url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
-                </BaseLayer>
-                <BaseLayer checked name="Integridad Ecológica">
-                    <WMSTileLayer
-                      transparent
-                      format='image/png'
-                      layers='MEX_IE3C_250m:ie3c_2014_250m'
-                      attribution='CONABIO'
-                      url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_IE3C_250m/wms?' />
-                </BaseLayer>
-                <BaseLayer name="Cobertura de Suelo">
-                    <WMSTileLayer
-                      transparent
-                      format='image/png'
-                      layers='MEX_LC_Landsat_8C:MEX_LC_2015_Landsat_8C'
-                      attribution='CONABIO'
-                      url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_LC_Landsat_8C/wms?' />
-                </BaseLayer>
-                <Overlay checked name="ANPs">
-                  {anpLayer}
-                </Overlay>
-                <Overlay checked name="Regiones">
-                  {regionLayer}
-                </Overlay>
-                <Overlay checked name="Anillos">
-                  {ringLayer}
-                </Overlay>
-                <Overlay checked name="Nucleos">
-                  {kernelLayer}
-                </Overlay>
-                <Overlay checked name="Preservaciones">
-                  {preservationLayer}
-                </Overlay>
-              </LayersControl>
-                
-            </Map>;
-  }
-
-
   render() {
-    let anpLayer = null;
-    let regionLayer = null;
-    let ringLayer = null;
-    let kernelLayer = null;
-    let list = null;
     let dropdown = null;
     let selectedAnp = null;
     let rightContent = null;
-    let preservationLayer = null;
-    let mainContent = this.getMap(null);
+    let mainContent = <Overview center={position}
+                                zoom={zoom}
+                                maxZoom={15}
+                                minZoom={3} 
+                                anps={null}
+                                selection={null}
+                                changeBounds={this.changeBounds} />;
 
     if(this.isReady()) {
 
       if(window.innerWidth >= breakpoints.tablet) {
         console.log("Not mobile.");
-        list = this.getList();
         if(this.state.selection != null){
           let polygon1 = turf.flip(turf.polygon([[
                                [90, -180],
@@ -318,11 +188,6 @@ class App extends Component {
                             ]]));
           let polygon2 = this.state.selection;
           let diff = turf.difference(polygon1, polygon2);
-          let bbox = turf.bbox(polygon2);
-          let leafletBbox = [[bbox[1], bbox[0]],
-                             [bbox[3], bbox[2]]];
-
-          console.log(bbox);
 
           selectedAnp = <Polygon color="black"
                                  fillOpacity={opacity}
@@ -332,19 +197,19 @@ class App extends Component {
                                   showInfo={this.state.showInfo}
                                   />
 
-          console.log("bounds");
 
-          mainContent = this.getMap([selectedAnp]);
-          this.leafletMap.leafletElement.fitBounds(leafletBbox);
+          mainContent = <Overview center={position}
+                                zoom={zoom}
+                                maxZoom={15}
+                                minZoom={3} 
+                                anps={null}
+                                selection={this.state.selection}
+                                changeBounds={this.changeBounds} />;
+          //this.leafletMap.leafletElement.fitBounds(leafletBbox);
         } else {
           console.log("This is the content for a tablet or desktop.");
           rightContent = this.getList();
-          mainContent = <Overview center={position}
-                                  zoom={zoom}
-                                  maxZoom={15}
-                                  minZoom={3} 
-                                  anps={this.getGeoJson()}
-                                  changeBounds={this.changeBounds} />
+
         }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
@@ -355,12 +220,7 @@ class App extends Component {
                                  handleClick={e=>this.handleCloseInfo(e)}
                                  showInfo={this.state.showInfo}/>
         } else {
-          mainContent = <Overview center={position}
-                                  zoom={zoom}
-                                  maxZoom={15}
-                                  minZoom={3} 
-                                  anps={this.getGeoJson()}
-                                  changeBounds={this.changeBounds} />
+          console.log("Nothing selected and mobile.");
         }
         
       }
@@ -385,7 +245,7 @@ class App extends Component {
                                   zoom={zoom}
                                   maxZoom={15}
                                   minZoom={3} 
-                                  anps={this.getGeoJson()}
+                                  anps={this.getAnp()}
                                   changeBounds={this.changeBounds.bind(this)}
                                   selection={this.state.selection} />
           </div>
@@ -394,7 +254,5 @@ class App extends Component {
     );
   }
 }
-
-
 
 export default App;

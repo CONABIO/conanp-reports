@@ -14,7 +14,27 @@ const CODE = "id_07";
 const REGIONS_NAME = "region";
 const NAME = "nombre";
 
+
+function loadUrl(url, callback) {
+  console.log("Loading url.")
+  fetch(url,{
+      method: "GET",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Accept-Encoding": "gzip,deflate",
+      }})
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      callback(data[0]);
+  });
+}
+
 export { breakpoints,
+         loadUrl,
          ANPS_URL,
          KERNELS_URL,
          RINGS_URL,

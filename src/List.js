@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './List.css';
-import { breakpoints, CODE, NAME, API } from './util.js';
+import { breakpoints, CODE, NAME } from './util.js';
 
 export default class List extends Component {
 
