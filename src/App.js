@@ -4,6 +4,7 @@ import List from './List.js';
 import Dropdown from './Dropdown.js';
 import Overview from './Overview.js';
 import Content from './Content.js';
+import { BounceLoader } from 'react-spinners';
 import { Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
@@ -179,6 +180,10 @@ class App extends Component {
       }
     } else {
       console.log("Not ready yet.");
+
+      return <div className='App-spinner'>
+               <BounceLoader color='#72a052' />
+             </div>
     }
 
     return (
