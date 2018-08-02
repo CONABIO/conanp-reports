@@ -41,44 +41,8 @@ class App extends Component {
     this.setState({anp: data});
   }
 
-  setKernel(data) {
-    this.setState({kernel: data});
-  }
-
-  setRing(data) {
-    this.setState({ring: data});
-  }
-
-  setPreservation(data) {
-    this.setState({preservation: data});
-  }
-
-  setRegion(data) {
-    this.setState({region: data});
-  }
-
   isReady(){
     return this.state.anp != null ;
-  }
-
-  getAnp() {
-    return this.state.anp;
-  }
-
-  getRing() {
-    return this.state.ring;
-  }
-
-  getPreservation() {
-    return this.state.preservation;
-  }
-
-  getRegion() {
-    return this.state.region;
-  }
-
-  getKernel() {
-    return this.state.kernel;
   }
 
   getStyleFactory(color){
@@ -114,7 +78,6 @@ class App extends Component {
                       let aux = turf.bboxPolygon(turf.bbox(element));
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     });
-    
     return <List anps={options}
                  handleClick={e => this.changeSelectionHelper(e)} />
   }
@@ -130,7 +93,6 @@ class App extends Component {
     //let leafletBbox = this.state.boundBox;
     //this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
-
 
   changeBounds(bounds){
     console.log("The bounds are " + bounds)
@@ -166,16 +128,16 @@ class App extends Component {
     let dropdown = null;
     let selectedAnp = null;
     let rightContent = null;
-    let mainContent = <Overview center={position}
-                                zoom={zoom}
-                                maxZoom={15}
-                                minZoom={3} 
-                                anps={null}
-                                selection={null}
-                                changeBounds={this.changeBounds} />;
-
+    let mainContent = null;
     if(this.isReady()) {
-
+      mainContent = <Overview center={position}
+                              onEachFeature={this.onEachFeature.bind(this)}
+                              zoom={zoom}
+                              maxZoom={15}
+                              minZoom={3} 
+                              anps={this.state.anp}
+                              changeBounds={this.changeBounds.bind(this)}
+                              selection={this.state.selection} />;
       if(window.innerWidth >= breakpoints.tablet) {
         console.log("Not mobile.");
         if(this.state.selection != null){
@@ -188,7 +150,6 @@ class App extends Component {
                             ]]));
           let polygon2 = this.state.selection;
           let diff = turf.difference(polygon1, polygon2);
-
           selectedAnp = <Polygon color="black"
                                  fillOpacity={opacity}
                                  positions={turf.flip(diff).geometry.coordinates} />
@@ -196,20 +157,12 @@ class App extends Component {
                                   handleClick={e=>this.handleCloseInfo(e)}
                                   showInfo={this.state.showInfo}
                                   />
-
-
-          mainContent = <Overview center={position}
-                                zoom={zoom}
-                                maxZoom={15}
-                                minZoom={3} 
-                                anps={null}
-                                selection={this.state.selection}
-                                changeBounds={this.changeBounds} />;
           //this.leafletMap.leafletElement.fitBounds(leafletBbox);
         } else {
           console.log("This is the content for a tablet or desktop.");
-          rightContent = this.getList();
-
+          if(this.state.boundBox != null){
+            rightContent = this.getList();
+          }
         }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
@@ -241,13 +194,7 @@ class App extends Component {
             {rightContent}
           </div>
           <div className={"App-map-container"}>
-            <Overview center={position}
-                                  zoom={zoom}
-                                  maxZoom={15}
-                                  minZoom={3} 
-                                  anps={this.getAnp()}
-                                  changeBounds={this.changeBounds.bind(this)}
-                                  selection={this.state.selection} />
+            {mainContent}
           </div>
         </div>
       </div>
