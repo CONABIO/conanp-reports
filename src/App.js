@@ -8,7 +8,7 @@ import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'r
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
-import { breakpoints, CODE, NAME, API } from './util.js';
+import { breakpoints, CODE, NAME, PRESERVATIONS_URL, ANPS_URL, KERNELS_URL, RINGS_URL, REGIONS_URL } from './util.js';
 
 const { BaseLayer, Overlay } = LayersControl;
 
@@ -18,13 +18,17 @@ const { BaseLayer, Overlay } = LayersControl;
 //const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
+const opacity = 0.7;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      geojson: null,
-      ready: false,
+      anp: null,
+      preservation: null,
+      kernel: null,
+      ring: null,
+      region: null,
       boundBox: null,
       selection: null,
       showInfo: false
@@ -32,30 +36,90 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch(API)
+    this.loadUrl(ANPS_URL, this.setAnp.bind(this));
+    this.loadUrl(KERNELS_URL, this.setKernel.bind(this));
+    this.loadUrl(REGIONS_URL, this.setRegion.bind(this));
+    this.loadUrl(RINGS_URL, this.setRing.bind(this));
+    this.loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
+    this.getBoundingBoxFromMap();
+  }
+
+  loadUrl(url, callback) {
+    console.log("Loading url.")
+    fetch(url,{
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, cors, *same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept-Encoding": "gzip,deflate",
+        }})
       .then(response => {
         return response.json();
       })
       .then(data => {
-        this.setState({geojson: data,
-                       ready: true});
-        //console.log(this.state.geojson);
-        //console.log(new Set(this.state.geojson.features.map(element=>element.properties[CODE]).sort()));
-      });
-    this.getBoundingBoxFromMap();
+        callback(data[0]);
+    });
+  }
+
+  setAnp(data){
+    this.setState({anp: data});
+  }
+
+  setKernel(data) {
+    this.setState({kernel: data});
+  }
+
+  setRing(data) {
+    this.setState({ring: data});
+  }
+
+  setPreservation(data) {
+    this.setState({preservation: data});
+  }
+
+  setRegion(data) {
+    this.setState({region: data});
+  }
+
+  isReady(){
+    return this.state.anp != null &&
+           this.state.kernel != null &&
+           this.state.ring != null &&
+           this.state.region != null &&
+           this.state.preservation != null;
   }
 
   getGeoJson() {
-    return this.state.geojson;
+    return this.state.anp;
   }
 
-  getStyle(feature, layer) {
-    return {
-      color: 'black',
-      weight: 1,
-      opacity: 0.9
-    }
+  getRing() {
+    return this.state.ring;
   }
+
+  getPreservation() {
+    return this.state.preservation;
+  }
+
+  getRegion() {
+    return this.state.region;
+  }
+
+  getKernel() {
+    return this.state.kernel;
+  }
+
+  getStyleFactory(color){
+    return function getStyle(feature, layer) {
+        return {
+          color: color,
+          weight: 1,
+          opacity: opacity
+        }
+      }
+  }
+
 
   onEachFeature(feature, layer) {
     layer.on({
@@ -69,19 +133,24 @@ class App extends Component {
   }
 
   getList() {
-    let slice = this.state.geojson;
-    let boundBoxPolygon = turf.bboxPolygon(this.state.boundBox);
+    let slice = this.state.anp;
+    let bounds = this.state.boundBox;
+    let boundBox = [bounds.getWest(), 
+                      bounds.getNorth(), 
+                      bounds.getEast(), 
+                      bounds.getSouth()];
+    let boundBoxPolygon = turf.bboxPolygon(boundBox);
     let options = slice.features.filter(element => {
                       let aux = turf.bboxPolygon(turf.bbox(element));
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     });
     
     return <List anps={options}
-                 handleClick={e => this.changeSelection(e)} />
+                 handleClick={e => this.changeSelectionHelper(e)} />
   }
 
   getDropDown() {
-    let slice = this.state.geojson;
+    let slice = this.state.anp;
     return <Dropdown anps={slice.features}
                      handleClick={e => this.changeSelection(e)} />
   }
@@ -92,15 +161,17 @@ class App extends Component {
 
   handleCloseInfo(event) {
     this.setState({selection:null, showInfo:false});
+    let leafletBbox = this.state.boundBox;
+    this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
 
   getBoundingBoxFromMap() {
-    let bounds = this.leafletMap.leafletElement.getBounds();
-    let boundBox = [bounds.getWest(), 
-                       bounds.getNorth(), 
-                       bounds.getEast(), 
-                       bounds.getSouth()];
-    this.setState({boundBox: boundBox});
+    let selection =  this.state.selection;
+    if(selection == null) {
+      let bounds = this.leafletMap.leafletElement.getBounds();
+      this.setState({boundBox: bounds});
+    }
+
   }
 
   changeSelection(event){
@@ -110,11 +181,11 @@ class App extends Component {
   }
 
   changeSelectionHelper(newSelection) {
-    let geojson = this.state.geojson;
+    let anp = this.state.anp;
     let selection = null;
     let showInfo = false;
-    if(geojson != null) {
-      geojson.features.forEach(element => {
+    if(anp != null) {
+      anp.features.forEach(element => {
         if(element.properties[CODE] === newSelection){
           selection = element;
         }
@@ -143,6 +214,23 @@ class App extends Component {
   }
 
   getMap(content){
+
+    let anpLayer = null;
+    let ringLayer = null;
+    let kernelLayer = null;
+    let regionLayer = null;
+    let preservationLayer = null;
+
+    if(content != null) { 
+      //anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer
+      anpLayer = content[0];
+      regionLayer = content[1];
+      ringLayer = content[2];
+      preservationLayer = content[3];
+      kernelLayer = content[4];
+    }
+    
+
     return <Map className="App-map"
                 center={position} 
                 ref={map => { this.leafletMap = map; }} 
@@ -154,9 +242,9 @@ class App extends Component {
                 onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
               <LayersControl position="topright">
                 <TileLayer
-                      attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                      url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
-                <BaseLayer checked name="None">
+                  attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+                  url='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}' />
+                <BaseLayer name="None">
                     <TileLayer
                       attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
                       url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' />
@@ -169,7 +257,7 @@ class App extends Component {
                       attribution='CONABIO'
                       url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_IE3C_250m/wms?' />
                 </BaseLayer>
-                <BaseLayer checked name="Cobertura de Suelo">
+                <BaseLayer name="Cobertura de Suelo">
                     <WMSTileLayer
                       transparent
                       format='image/png'
@@ -177,7 +265,21 @@ class App extends Component {
                       attribution='CONABIO'
                       url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_LC_Landsat_8C/wms?' />
                 </BaseLayer>
-                {content}
+                <Overlay checked name="ANPs">
+                  {anpLayer}
+                </Overlay>
+                <Overlay checked name="Regiones">
+                  {regionLayer}
+                </Overlay>
+                <Overlay checked name="Anillos">
+                  {ringLayer}
+                </Overlay>
+                <Overlay checked name="Nucleos">
+                  {kernelLayer}
+                </Overlay>
+                <Overlay checked name="Preservaciones">
+                  {preservationLayer}
+                </Overlay>
               </LayersControl>
                 
             </Map>;
@@ -185,17 +287,30 @@ class App extends Component {
 
 
   render() {
-    let geoJsonLayer = null;
+    let anpLayer = null;
+    let regionLayer = null;
+    let ringLayer = null;
+    let kernelLayer = null;
     let list = null;
     let dropdown = null;
     let selectedAnp = null;
     let rightContent = null;
+    let preservationLayer = null;
     let mainContent = this.getMap(null);
 
-    if(this.state.ready) {
-      geoJsonLayer = <GeoJSON data={this.getGeoJson()} 
-                              style={this.getStyle} 
-                              onEachFeature={this.onEachFeature.bind(this)} />
+    if(this.isReady()) {
+      anpLayer = <GeoJSON data={this.getGeoJson()} 
+                          style={this.getStyleFactory("red")} 
+                          onEachFeature={this.onEachFeature.bind(this)} />
+      regionLayer = <GeoJSON data={this.getRegion()} 
+                             style={this.getStyleFactory("white")} />
+      ringLayer = <GeoJSON data={this.getRing()} 
+                            style={this.getStyleFactory("blue")} />
+      kernelLayer = <GeoJSON data={this.getKernel()} 
+                             style={this.getStyleFactory("green")} />
+      preservationLayer = <GeoJSON data={this.getPreservation()} 
+                             style={this.getStyleFactory("black")} />
+
       if(window.innerWidth >= breakpoints.tablet) {
         console.log("Not mobile.");
         list = this.getList();
@@ -209,18 +324,28 @@ class App extends Component {
                             ]]));
           let polygon2 = this.state.selection;
           let diff = turf.difference(polygon1, polygon2);
+          let bbox = turf.bbox(polygon2);
+          let leafletBbox = [[bbox[1], bbox[0]],
+                             [bbox[3], bbox[2]]];
+
+          console.log(bbox);
+
           selectedAnp = <Polygon color="black"
-                                 fillOpacity={.9}
+                                 fillOpacity={opacity}
                                  positions={turf.flip(diff).geometry.coordinates} />
           rightContent = <Content selection={this.state.selection}
                                   handleClick={e=>this.handleCloseInfo(e)}
                                   showInfo={this.state.showInfo}
                                   />
-          mainContent = this.getMap(selectedAnp);
+
+          console.log("bounds");
+
+          mainContent = this.getMap([selectedAnp]);
+          this.leafletMap.leafletElement.fitBounds(leafletBbox);
         } else {
           console.log("This is the content for a tablet or desktop.");
           rightContent = this.getList();
-          mainContent = this.getMap(geoJsonLayer);
+          mainContent = this.getMap([anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer]);
         }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
@@ -229,13 +354,14 @@ class App extends Component {
         if(this.state.selection != null) {
           mainContent = <Content selection={this.state.selection}
                                  handleClick={e=>this.handleCloseInfo(e)}
-                                 showInfo={this.state.showInfo}
-                                  />
+                                 showInfo={this.state.showInfo}/>
         } else {
-          mainContent = this.getMap(geoJsonLayer);
+          mainContent = this.getMap([anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer]);
         }
         
       }
+    } else {
+      console.log("Not ready yet.");
     }
 
     return (
