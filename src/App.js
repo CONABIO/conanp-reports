@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import List from './List.js';
 import Dropdown from './Dropdown.js';
+import Overview from './Overview.js';
 import Content from './Content.js';
 //import Responsive from 'react-responsive';
 import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
@@ -12,10 +13,6 @@ import { breakpoints, CODE, NAME, PRESERVATIONS_URL, ANPS_URL, KERNELS_URL, RING
 
 const { BaseLayer, Overlay } = LayersControl;
 
-//const Desktop = props => <Responsive {...props} minWidth={992} />;
-//const Tablet = props => <Responsive {...props} minWidth={768} maxWidth={991} />;
-//const Mobile = props => <Responsive {...props} maxWidth={767} />;
-//const Default = props => <Responsive {...props} minWidth={768} />;
 const position = [23.950464, -102.532867];
 const zoom = 5;
 const opacity = 0.7;
@@ -37,11 +34,11 @@ class App extends Component {
 
   componentDidMount() {
     this.loadUrl(ANPS_URL, this.setAnp.bind(this));
-    this.loadUrl(KERNELS_URL, this.setKernel.bind(this));
-    this.loadUrl(REGIONS_URL, this.setRegion.bind(this));
-    this.loadUrl(RINGS_URL, this.setRing.bind(this));
-    this.loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
-    this.getBoundingBoxFromMap();
+    //this.loadUrl(KERNELS_URL, this.setKernel.bind(this));
+    //this.loadUrl(REGIONS_URL, this.setRegion.bind(this));
+    //this.loadUrl(RINGS_URL, this.setRing.bind(this));
+    //this.loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
+    //this.getBoundingBoxFromMap();
   }
 
   loadUrl(url, callback) {
@@ -83,11 +80,7 @@ class App extends Component {
   }
 
   isReady(){
-    return this.state.anp != null &&
-           this.state.kernel != null &&
-           this.state.ring != null &&
-           this.state.region != null &&
-           this.state.preservation != null;
+    return this.state.anp != null ;
   }
 
   getGeoJson() {
@@ -135,10 +128,15 @@ class App extends Component {
   getList() {
     let slice = this.state.anp;
     let bounds = this.state.boundBox;
+
+    console.log("From get list");
+    console.log(bounds);
+
+
     let boundBox = [bounds.getWest(), 
-                      bounds.getNorth(), 
-                      bounds.getEast(), 
-                      bounds.getSouth()];
+                    bounds.getNorth(), 
+                    bounds.getEast(), 
+                    bounds.getSouth()];
     let boundBoxPolygon = turf.bboxPolygon(boundBox);
     let options = slice.features.filter(element => {
                       let aux = turf.bboxPolygon(turf.bbox(element));
@@ -172,6 +170,13 @@ class App extends Component {
       this.setState({boundBox: bounds});
     }
 
+  }
+
+  changeBounds(bounds){
+    console.log("The bounds are " + bounds)
+    console.log(bounds);
+    this.setState({boundBox: bounds});
+    console.log(this.state.boundBox);
   }
 
   changeSelection(event){
@@ -299,17 +304,6 @@ class App extends Component {
     let mainContent = this.getMap(null);
 
     if(this.isReady()) {
-      anpLayer = <GeoJSON data={this.getGeoJson()} 
-                          style={this.getStyleFactory("red")} 
-                          onEachFeature={this.onEachFeature.bind(this)} />
-      regionLayer = <GeoJSON data={this.getRegion()} 
-                             style={this.getStyleFactory("white")} />
-      ringLayer = <GeoJSON data={this.getRing()} 
-                            style={this.getStyleFactory("blue")} />
-      kernelLayer = <GeoJSON data={this.getKernel()} 
-                             style={this.getStyleFactory("green")} />
-      preservationLayer = <GeoJSON data={this.getPreservation()} 
-                             style={this.getStyleFactory("black")} />
 
       if(window.innerWidth >= breakpoints.tablet) {
         console.log("Not mobile.");
@@ -345,7 +339,12 @@ class App extends Component {
         } else {
           console.log("This is the content for a tablet or desktop.");
           rightContent = this.getList();
-          mainContent = this.getMap([anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer]);
+          mainContent = <Overview center={position}
+                                  zoom={zoom}
+                                  maxZoom={15}
+                                  minZoom={3} 
+                                  anps={this.getGeoJson()}
+                                  changeBounds={this.changeBounds} />
         }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
@@ -356,7 +355,12 @@ class App extends Component {
                                  handleClick={e=>this.handleCloseInfo(e)}
                                  showInfo={this.state.showInfo}/>
         } else {
-          mainContent = this.getMap([anpLayer, regionLayer, ringLayer, preservationLayer, kernelLayer]);
+          mainContent = <Overview center={position}
+                                  zoom={zoom}
+                                  maxZoom={15}
+                                  minZoom={3} 
+                                  anps={this.getGeoJson()}
+                                  changeBounds={this.changeBounds} />
         }
         
       }
@@ -377,7 +381,13 @@ class App extends Component {
             {rightContent}
           </div>
           <div className={"App-map-container"}>
-            {mainContent}
+            <Overview center={position}
+                                  zoom={zoom}
+                                  maxZoom={15}
+                                  minZoom={3} 
+                                  anps={this.getGeoJson()}
+                                  changeBounds={this.changeBounds.bind(this)}
+                                  selection={this.state.selection} />
           </div>
         </div>
       </div>
