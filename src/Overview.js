@@ -65,17 +65,18 @@ export default class Overview extends Component {
   render() {
 
 
-    let anpLayer = null;
+    let objectLayer = null;
 
     if(this.props.selection == null) {
-      console.log("Selection is " + this.props.selection);
-      console.log(this.props.anps);
-      anpLayer = <Overlay checked 
-                          name="ANPs">
-                    <GeoJSON data={this.props.anps}
-                             style={this.getStyleFactory("black")}
-                             onEachFeature={this.props.onEachFeature} />
-                 </Overlay>
+      //console.log("Selection is " + this.props.selection);
+      //console.log(this.props.anps);
+      objectLayer = <Overlay key={this.props.level}
+                             checked 
+                             name={this.props.title}>
+                        <GeoJSON data={this.props.anps}
+                                 style={this.getStyleFactory("black")}
+                                 onEachFeature={this.props.onEachFeature} />
+                    </Overlay>
     }
 
     return <Map className="App-map"
@@ -112,7 +113,7 @@ export default class Overview extends Component {
                       attribution='CONABIO'
                       url='http://webportal.conabio.gob.mx:8085/geoserver/MEX_LC_Landsat_8C/wms?' />
                 </BaseLayer>
-                {anpLayer}
+                {objectLayer}
               </LayersControl>
             </Map>;
   }
