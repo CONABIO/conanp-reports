@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import { breakpoints } from './util.js';
+import * as turf from '@turf/turf';
 
 const { BaseLayer, Overlay } = LayersControl;
 const opacity = 0.7;
@@ -15,13 +16,11 @@ export default class Overview extends Component {
 
   componentDidMount() { 
     console.log("Map did mount.")
-
     this.getBoundingBoxFromMap();
     ;
   }
 
   getMapStyle() {
-    console.log(window.innerWidth);
     if(window.innerWidth > breakpoints.desktop) { 
       return {width: "60vw", 
               height: "100vh"};
@@ -44,9 +43,9 @@ export default class Overview extends Component {
 
   getBoundingBoxFromMap() {
     
-    let selection =  this.props.selection;
+    let polygons = this.props.selection.filter(element => element!=null);
     
-    if(selection == null) {
+    if(!(polygons.length > 0)) {
       let bounds = this.leafletMap.leafletElement.getBounds();
       this.changeBounds(bounds)
     }
@@ -67,13 +66,47 @@ export default class Overview extends Component {
 
     let objectLayer = null;
 
-    if(this.props.selection == null) {
-      //console.log("Selection is " + this.props.selection);
-      //console.log(this.props.anps);
+    let polygons = this.props.selection.filter(element => element!=null);
+
+
+
+    if(polygons.length > 0) {
+      console.log("Selection is: ");
+      console.log(polygons);
+
+      let clonePolygons = polygons.slice(0);
+
+      let union = clonePolygons.shift();
+      clonePolygons.forEach(function(polygon){
+        union = turf.union(union, polygon);
+      });
+      console.log("Union");
+      console.log(union);
+
+      let world = turf.flip(turf.polygon([[
+                               [90, -180],
+                               [90, 180],
+                               [-90, 180],
+                               [-90, -180],
+                               [90, -180]
+                            ]]));
+
+      let mask = turf.difference(world, union);
+
+
       objectLayer = <Overlay key={this.props.level}
                              checked 
                              name={this.props.title}>
-                        <GeoJSON data={this.props.anps}
+                      <Polygon color="black"
+                               fillOpacity={opacity}
+                               positions={turf.flip(mask).geometry.coordinates} />
+                    </Overlay>;
+
+    } else {
+      objectLayer = <Overlay key={this.props.level}
+                             checked 
+                             name={this.props.title}>
+                        <GeoJSON data={this.props.objects}
                                  style={this.getStyleFactory("black")}
                                  onEachFeature={this.props.onEachFeature} />
                     </Overlay>
