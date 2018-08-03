@@ -9,7 +9,7 @@ import { Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
-import { breakpoints, loadUrl, CODE, ANPS_URL } from './util.js';
+import { breakpoints, loadUrl, CODE, ANPS_URL, REGIONS_URL} from './util.js';
 
 const position = [23.950464, -102.532867];
 const zoom = 5;
@@ -26,24 +26,33 @@ class App extends Component {
       region: null,
       boundBox: null,
       selection: null,
+      level: 1,
       showInfo: false
     };
   }
 
   componentDidMount() {
+    let title = (this.state.level == 0 ? "Local": (this.state.level == 1 ? "Regional": "Nacional"));
+    this.setState({title:title});
     loadUrl(ANPS_URL, this.setAnp.bind(this));
+    loadUrl(REGIONS_URL, this.setRegion.bind(this));
     //loadUrl(KERNELS_URL, this.setKernel.bind(this));
     //loadUrl(REGIONS_URL, this.setRegion.bind(this));
     //loadUrl(RINGS_URL, this.setRing.bind(this));
     //loadUrl(PRESERVATIONS_URL, this.setPreservation.bind(this));
   }
 
-  setAnp(data){
+  setAnp(data) {
     this.setState({anp: data});
   }
 
-  isReady(){
-    return this.state.anp != null ;
+  setRegion(data) {
+    this.setState({region: data});
+  }
+
+  isReady() {
+    return this.state.anp != null &&
+           this.state.region != null;
   }
 
   getStyleFactory(color){
@@ -62,13 +71,25 @@ class App extends Component {
     });
   }
 
+  getCurrentObjects() {
+
+    let level = this.state.level;
+    if(level === 0) {
+      return this.state.anp;
+    } else if (level === 1) {
+      return this.state.region;
+    } else {
+      return null;
+    }
+  }
+
   clickToFeature(e) {
      let layer = e.target;
      this.setState({selection:layer.feature, showInfo:true});
   }
 
   getList() {
-    let slice = this.state.anp;
+    let slice = this.getCurrentObjects();
     let bounds = this.state.boundBox;
     let boundBox = [bounds.getWest(), 
                     bounds.getNorth(), 
@@ -84,7 +105,7 @@ class App extends Component {
   }
 
   getDropDown() {
-    let slice = this.state.anp;
+    let slice = this.getCurrentObjects();
     return <Dropdown anps={slice.features}
                      handleClick={e => this.changeSelection(e)} />
   }
@@ -97,9 +118,9 @@ class App extends Component {
 
   changeBounds(bounds){
     console.log("The bounds are " + bounds)
-    console.log(bounds);
+    //console.log(bounds);
     this.setState({boundBox: bounds});
-    console.log(this.state.boundBox);
+    //console.log(this.state.boundBox);
   }
 
   changeSelection(event){
@@ -108,8 +129,14 @@ class App extends Component {
 
   }
 
+  handleLevel(level) {
+    let title = (level == 0 ? "Local": (level == 1 ? "Regional": "Nacional"));
+    this.setState({level:level, title:title});
+
+  }
+
   changeSelectionHelper(newSelection) {
-    let anp = this.state.anp;
+    let anp = this.getCurrentObjects();
     let selection = null;
     let showInfo = false;
     if(anp != null) {
@@ -130,13 +157,16 @@ class App extends Component {
     let selectedAnp = null;
     let rightContent = null;
     let mainContent = null;
+    let shapes = this.getCurrentObjects();
     if(this.isReady()) {
       mainContent = <Overview center={position}
                               onEachFeature={this.onEachFeature.bind(this)}
                               zoom={zoom}
+                              title={this.state.title}
+                              level={this.state.level}
                               maxZoom={15}
                               minZoom={3} 
-                              anps={this.state.anp}
+                              anps={shapes}
                               changeBounds={this.changeBounds.bind(this)}
                               selection={this.state.selection} />;
       if(window.innerWidth >= breakpoints.tablet) {
@@ -191,8 +221,15 @@ class App extends Component {
         <nav className="navbar" aria-label="main navigation">
           <div className="navbar-brand">
             <a className="navbar-item">Reportes CONANP</a>
-            <span className="navbar-item">{dropdown}</span>
           </div>
+          <div className="navbar-item tabs is-right is-toggle is-toggle-rounded">
+            <ul>
+              <li onClick={e=>this.handleLevel(0)} className={this.state.level == 0 ? "is-active": ""}><a>Local</a></li>
+              <li onClick={e=>this.handleLevel(1)} className={this.state.level == 1 ? "is-active": ""}><a>Regional</a></li>
+              <li className={this.state.level == 2 ? "is-active": ""}><a>Nacional</a></li>
+            </ul>
+          </div>
+          <span className="navbar-item">{dropdown}</span>
         </nav>
         <div className="App-container">
           <div className="App-aside">
