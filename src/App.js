@@ -24,6 +24,11 @@ class App extends Component {
       kernel: null,
       ring: null,
       region: null,
+      anpReady: false,
+      preservationReady: false,
+      kernelReady: false,
+      ringReady: false,
+      regionReady: false,
       boundBox: null,
       selection: null,
       level: 1,
@@ -43,23 +48,27 @@ class App extends Component {
   }
 
   setRegion(data) {
-    this.setState({region: data});
+    this.setState({region: data,
+                   regionReady: true});
   }
 
   setRing(data) {
-    this.setState({ring: data});
+    this.setState({ring: data,
+                   ringReady: true});
     console.log("ring:");
     console.log(this.state.ring);
   }
 
   setPreservation(data) {
-    this.setState({preservation: data});
+    this.setState({preservation: data,
+                   preservationReady: true});
     console.log("preservation:");
     console.log(this.state.preservation);
   }
 
   setKernel(data) {
-    this.setState({kernel: data});
+    this.setState({kernel: data,
+                   kernelReady: true});
     console.log("kernel:");
     console.log(this.state.kernel);
   }
@@ -67,6 +76,20 @@ class App extends Component {
   isReady() {
     return this.state.anp != null &&
            this.state.region != null;
+  }
+
+  isZoomReady() {
+    if(this.selection === null) {
+      return true;
+    } else {
+      return this.state.anpReady  &&
+             this.state.regionReady &&
+             this.state.ringReady &&
+             this.state.preservationReady &&
+             this.state.kernelReady;
+    }
+
+    
   }
 
   getStyleFactory(color){
@@ -132,7 +155,12 @@ class App extends Component {
                    kernel:null,
                    ring:null,
                    preservation:null,
-                   showInfo:false});
+                   showInfo:false,
+                   anpReady: false,
+                   preservationReady: false,
+                   kernelReady: false,
+                   ringReady: false,
+                   regionReady: false});
     //let leafletBbox = this.state.boundBox;
     //this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
@@ -173,7 +201,9 @@ class App extends Component {
       showInfo = true;
       this.loadOtherObjects();
     }
-    this.setState({selection: selection, showInfo: showInfo});
+    this.setState({selection: selection, 
+                   showInfo: showInfo,
+                   anpReady: true});
   }
 
   loadOtherObjects() {
@@ -213,18 +243,11 @@ class App extends Component {
       if(window.innerWidth >= breakpoints.tablet) {
         console.log("Not mobile.");
         if(this.state.selection != null){
-          let polygon1 = turf.flip(turf.polygon([[
-                               [90, -180],
-                               [90, 180],
-                               [-90, 180],
-                               [-90, -180],
-                               [90, -180]
-                            ]]));
-          let polygon2 = this.state.selection;
-          let diff = turf.difference(polygon1, polygon2);
-          selectedAnp = <Polygon color="black"
-                                 fillOpacity={opacity}
-                                 positions={turf.flip(diff).geometry.coordinates} />
+          if(!this.isZoomReady()) {
+            mainContent = <div className='App-spinner'>
+                            <BounceLoader color='#72a052' />
+                          </div>
+          }
           rightContent = <Content selection={this.state.selection}
                                   handleClick={e=>this.handleCloseInfo(e)}
                                   showInfo={this.state.showInfo}

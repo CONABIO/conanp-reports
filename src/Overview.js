@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
-import { breakpoints } from './util.js';
+import { breakpoints, getColor } from './util.js';
 import * as turf from '@turf/turf';
 
 const { BaseLayer, Overlay } = LayersControl;
@@ -65,7 +65,7 @@ export default class Overview extends Component {
 
 
     let objectLayer = null;
-
+    let maskLayer = null;
     let polygons = this.props.selection.filter(element => element!=null);
 
 
@@ -94,15 +94,25 @@ export default class Overview extends Component {
       let mask = turf.difference(world, union);
 
 
-      objectLayer = <Overlay key={this.props.level}
-                             checked 
-                             name={this.props.title}>
-                      <Polygon color="black"
-                               fillOpacity={opacity}
-                               positions={turf.flip(mask).geometry.coordinates} />
-                    </Overlay>;
+      objectLayer = polygons.map(function(polygon, index) {
+        let tipo = polygon.properties['tipo'];
+        return <Overlay key={index}
+                        checked 
+                        name={tipo}>
+                  <Polygon color={getColor(tipo)}
+                           fillOpacity={opacity}
+                           positions={turf.flip(polygon).geometry.coordinates} />
+               </Overlay>;
+      });
+
+      maskLayer = <Polygon key={this.props.level}
+                             color="black"
+                             fillOpacity={opacity}
+                             positions={turf.flip(mask).geometry.coordinates} />;
 
     } else {
+
+
       objectLayer = <Overlay key={this.props.level}
                              checked 
                              name={this.props.title}>
@@ -148,6 +158,7 @@ export default class Overview extends Component {
                 </BaseLayer>
                 {objectLayer}
               </LayersControl>
+              {maskLayer}
             </Map>;
   }
 
