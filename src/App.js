@@ -24,11 +24,9 @@ class App extends Component {
       kernel: null,
       ring: null,
       region: null,
-      anpReady: false,
       preservationReady: false,
       kernelReady: false,
       ringReady: false,
-      regionReady: false,
       boundBox: null,
       selection: null,
       level: 1,
@@ -79,17 +77,10 @@ class App extends Component {
   }
 
   isZoomReady() {
-    if(this.selection === null) {
-      return true;
-    } else {
-      return this.state.anpReady  &&
-             this.state.regionReady &&
+      return this.state.regionReady &&
              this.state.ringReady &&
              this.state.preservationReady &&
              this.state.kernelReady;
-    }
-
-    
   }
 
   getStyleFactory(color){
@@ -156,11 +147,9 @@ class App extends Component {
                    ring:null,
                    preservation:null,
                    showInfo:false,
-                   anpReady: false,
                    preservationReady: false,
                    kernelReady: false,
-                   ringReady: false,
-                   regionReady: false});
+                   ringReady: false});
     //let leafletBbox = this.state.boundBox;
     //this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
