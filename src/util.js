@@ -38,7 +38,16 @@ function loadUrl(url, callback) {
   });
 }
 
+function getColor(type) {
+    return type === "anillo"       ? "yellow":
+           type === "anp"          ? "blue":
+           type === "nucleo"       ? "green":
+           type === "preservacion" ? "red":
+                                     "black";
+}
+
 export { breakpoints,
+         getColor,
          loadUrl,
          ANPS_URL,
          REGIONS_URL,
