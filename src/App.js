@@ -58,6 +58,7 @@ class App extends Component {
   }
 
   setPreservation(data) {
+    console.log("dangerous data", data);
     this.setState({preservation: data,
                    preservationReady: true});
     console.log("preservation:");
@@ -89,8 +90,8 @@ class App extends Component {
           color: color,
           weight: 1,
           opacity: opacity
-        }
-      }
+        };
+      };
   }
 
   onEachFeature(feature, layer) {
@@ -122,9 +123,9 @@ class App extends Component {
   getList() {
     let slice = this.getCurrentObjects();
     let bounds = this.state.boundBox;
-    let boundBox = [bounds.getWest(), 
-                    bounds.getNorth(), 
-                    bounds.getEast(), 
+    let boundBox = [bounds.getWest(),
+                    bounds.getNorth(),
+                    bounds.getEast(),
                     bounds.getSouth()];
     let boundBoxPolygon = turf.bboxPolygon(boundBox);
     let options = slice.features.filter(element => {
@@ -132,13 +133,13 @@ class App extends Component {
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     });
     return <List anps={options}
-                 handleClick={e => this.changeSelectionHelper(e)} />
+                 handleClick={e => this.changeSelectionHelper(e)} />;
   }
 
   getDropDown() {
     let slice = this.getCurrentObjects();
     return <Dropdown anps={slice.features}
-                     handleClick={e => this.changeSelection(e)} />
+                     handleClick={e => this.changeSelection(e)} />;
   }
 
   handleCloseInfo(event) {
@@ -155,7 +156,7 @@ class App extends Component {
   }
 
   changeBounds(bounds){
-    console.log("The bounds are " + bounds)
+    console.log("The bounds are " + bounds);
     //console.log(bounds);
     this.setState({boundBox: bounds});
     //console.log(this.state.boundBox);
@@ -168,8 +169,8 @@ class App extends Component {
   }
 
   handleLevel(level) {
-    let title = level === 0 ? "Local": 
-                level === 1 ? "Regional": 
+    let title = level === 0 ? "Local":
+                level === 1 ? "Regional":
                                "Nacional";
     this.setState({level:level, title:title});
 
@@ -190,7 +191,7 @@ class App extends Component {
       showInfo = true;
       this.loadOtherObjects();
     }
-    this.setState({selection: selection, 
+    this.setState({selection: selection,
                    showInfo: showInfo,
                    anpReady: true});
   }
@@ -222,7 +223,7 @@ class App extends Component {
                               title={this.state.title}
                               level={this.state.level}
                               maxZoom={15}
-                              minZoom={3} 
+                              minZoom={3}
                               objects={shapes}
                               changeBounds={this.changeBounds.bind(this)}
                               selection={[this.state.selection,
@@ -235,17 +236,17 @@ class App extends Component {
           if(!this.isZoomReady()) {
             mainContent = <div className='App-spinner'>
                             <BounceLoader color='#72a052' />
-                          </div>
+                          </div>;
           }
           rightContent = <Content selection={this.state.selection}
                                   handleClick={e=>this.handleCloseInfo(e)}
                                   showInfo={this.state.showInfo}
-                                  />
+                                  />;
           //this.leafletMap.leafletElement.fitBounds(leafletBbox);
         } else {
           console.log("This is the content for a tablet or desktop.");
           if(this.state.boundBox != null){
-            console.log("Getting the list.")
+            console.log("Getting the list.");
             rightContent = this.getList();
           }
         }
@@ -256,18 +257,18 @@ class App extends Component {
         if(this.state.selection != null) {
           mainContent = <Content selection={this.state.selection}
                                  handleClick={e=>this.handleCloseInfo(e)}
-                                 showInfo={this.state.showInfo}/>
+                                 showInfo={this.state.showInfo}/>;
         } else {
           console.log("Nothing selected and mobile.");
         }
-        
+
       }
     } else {
       console.log("Not ready yet.");
 
       return <div className='App-spinner'>
                <BounceLoader color='#72a052' />
-             </div>
+             </div>;
     }
 
     return (

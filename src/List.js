@@ -10,14 +10,14 @@ export default class List extends Component {
   }
 
   getStyleList() {
-    if(window.innerWidth >= breakpoints.desktop) { 
-      return {width: "40vw", 
+    if(window.innerWidth >= breakpoints.desktop) {
+      return {width: "40vw",
               height: "100vh",
               right: "0",
               top: "0",
               bottom: "0"};
-    } else if(window.innerWidth >= breakpoints.tablet) {  
-      return {width: "100vw", 
+    } else if(window.innerWidth >= breakpoints.tablet) {
+      return {width: "100vw",
               height: "100vh",
               right: "0",
               top: "0",
@@ -39,6 +39,6 @@ export default class List extends Component {
              <ul className="menu-list">
                {anps}
              </ul>
-           </aside>
+           </aside>;
   }
 }
