@@ -71,29 +71,26 @@ class App extends Component {
 
   isZoomReady() {
     return this.state.regionReady &&
-      this.state.ringReady &&
-      this.state.preservationReady &&
-      this.state.kernelReady;
+           this.state.ringReady &&
+           this.state.preservationReady &&
+           this.state.kernelReady;
   }
 
-  getStyleFactory(color){
-    return function getStyle(feature, layer) {
-        return {
-          color: color,
-          weight: 1,
-          opacity: opacity
-        };
-      };
-  }
-
+  /**
+   * Method to attach the correct function to the click
+   * listener in the feature layer.
+   **/
   onEachFeature(feature, layer) {
     layer.on({
       click: this.clickToFeature.bind(this)
     });
   }
 
+  /**
+   * Helper function to obtain the current polygon array
+   * depending on the selection in the menu.
+   **/
   getCurrentObjects() {
-
     let level = this.state.level;
     if(level === 0) {
       return this.state.anp;
@@ -104,9 +101,26 @@ class App extends Component {
     }
   }
 
+  /**
+   * This will be called when the origin of the event is
+   * the click on a feature in the map. It will obtain the
+   * selected feature and call the helper function.
+   **/
   clickToFeature(e) {
+
     let layer = e.target;
     this.changeSelectionHelper(layer.feature);
+  }
+
+  /**
+   * This will be called when the origin of the event is
+   * the click on an element in the list. It will obtain the
+   * selected feature from the list element id, and call the 
+   * helper function.
+   **/
+  changeSelection(code){
+    let selection = this.getSelectionFromId(code);
+    this.changeSelectionHelper(selection);
   }
 
   getList() {
@@ -149,11 +163,6 @@ class App extends Component {
     console.log(bounds);
 
     this.setState({boundBox: bounds});
-  }
-
-  changeSelection(code){
-    let selection = this.getSelectionFromId(code);
-    this.changeSelectionHelper(selection);
   }
 
   handleLevel(level) {

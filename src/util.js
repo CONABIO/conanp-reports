@@ -40,10 +40,10 @@ function loadUrl(url, callback) {
 
 function getColor(type) {
   return type === "anillo"       ? "yellow":
-    type === "anp"          ? "blue":
-    type === "nucleo"       ? "green":
-    type === "preservacion" ? "red":
-    "black";
+         type === "anp"          ? "blue":
+         type === "nucleo"       ? "green":
+         type === "preservacion" ? "red":
+                                   "white";
 }
 
 export { breakpoints,
