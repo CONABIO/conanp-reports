@@ -17,14 +17,15 @@ const NAME = "nombre";
 
 
 function loadUrl(url, callback) {
+  // console.log("Loading url.");
   fetch(url,{
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Accept-Encoding": "gzip,deflate",
-      }})
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Accept-Encoding": "gzip,deflate",
+    }})
     .then(response => {
       return response.json();
     })
@@ -34,26 +35,26 @@ function loadUrl(url, callback) {
         payload = data[0];
       }
       callback(payload);
-  });
+    });
 }
 
 function getColor(type) {
-    return type === "anillo"       ? "yellow":
-           type === "anp"          ? "blue":
-           type === "nucleo"       ? "green":
-           type === "preservacion" ? "red":
-                                     "black";
+  return type === "anillo"       ? "yellow":
+    type === "anp"          ? "blue":
+    type === "nucleo"       ? "green":
+    type === "preservacion" ? "red":
+    "black";
 }
 
 export { breakpoints,
-         getColor,
-         loadUrl,
-         ANPS_URL,
-         REGIONS_URL,
-         KERNEL_URL,
-         RING_URL,
-         PRESERVATION_URL,
-         REGIONS_CODE, 
-         REGIONS_NAME,
-         CODE, 
-         NAME };
+  getColor,
+  loadUrl,
+  ANPS_URL,
+  REGIONS_URL,
+  KERNEL_URL,
+  RING_URL,
+  PRESERVATION_URL,
+  REGIONS_CODE, 
+  REGIONS_NAME,
+  CODE, 
+  NAME };
