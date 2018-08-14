@@ -52,22 +52,16 @@ class App extends Component {
   setRing(data) {
     this.setState({ring: data,
       ringReady: true});
-    // console.log("ring:");
-    // console.log(this.state.ring);
   }
 
   setPreservation(data) {
     this.setState({preservation: data,
       preservationReady: true});
-    // console.log("preservation:");
-    // console.log(this.state.preservation);
   }
 
   setKernel(data) {
     this.setState({kernel: data,
       kernelReady: true});
-    // console.log("kernel:");
-    // console.log(this.state.kernel);
   }
 
   isReady() {
@@ -146,11 +140,14 @@ class App extends Component {
       preservationReady: false,
       kernelReady: false,
       ringReady: false});
-    //let leafletBbox = this.state.boundBox;
-    //this.leafletMap.leafletElement.fitBounds(leafletBbox);
+    let leafletBbox = this.state.boundBox;
+    this.overview.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
 
   changeBounds(bounds){
+    console.log("The new bounds are:")
+    console.log(bounds);
+
     this.setState({boundBox: bounds});
   }
 
@@ -217,7 +214,8 @@ class App extends Component {
     let mainContent = null;
     let shapes = this.getCurrentObjects();
     if(this.isReady()) {
-      mainContent = <Overview center={position}
+      mainContent = <Overview ref={map => { this.overview = map; }}
+                              center={position}
                               onEachFeature={this.onEachFeature.bind(this)}
                               zoom={zoom}
                               title={this.state.title}
@@ -225,6 +223,7 @@ class App extends Component {
                               maxZoom={15}
                               minZoom={3}
                               objects={shapes}
+                              bounds={this.state.boundBox}
                               changeBounds={this.changeBounds.bind(this)}
                               selection={[this.state.selection,
                                           this.state.kernel,
