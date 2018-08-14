@@ -14,18 +14,18 @@ export default class Overview extends Component {
     this.changeBounds = this.props.changeBounds;
   }
 
-  componentDidMount() { 
-    console.log("Map did mount.")
+  componentDidMount() {
+    console.log("Map did mount.");
     this.getBoundingBoxFromMap();
     ;
   }
 
   getMapStyle() {
-    if(window.innerWidth > breakpoints.desktop) { 
-      return {width: "60vw", 
+    if(window.innerWidth > breakpoints.desktop) {
+      return {width: "60vw",
               height: "100vh"};
     } else if(window.innerWidth > breakpoints.tablet){
-      return {width: "100vw", 
+      return {width: "100vw",
               height: "50vh"};
     } else {
       return {right: "0",
@@ -42,23 +42,23 @@ export default class Overview extends Component {
 
 
   getBoundingBoxFromMap() {
-    
+
     let polygons = this.props.selection.filter(element => element!=null);
-    
+
     if(!(polygons.length > 0)) {
       let bounds = this.leafletMap.leafletElement.getBounds();
-      this.changeBounds(bounds)
+      this.changeBounds(bounds);
     }
   }
-  
+
   getStyleFactory(color){
     return function getStyle(feature, layer) {
         return {
           color: color,
           weight: 1,
           opacity: opacity
-        }
-      }
+        };
+      };
   }
 
   render() {
@@ -97,7 +97,7 @@ export default class Overview extends Component {
       objectLayer = polygons.map(function(polygon, index) {
         let tipo = polygon.properties['tipo'];
         return <Overlay key={index}
-                        checked 
+                        checked
                         name={tipo}>
                   <Polygon color={getColor(tipo)}
                            fillOpacity={opacity}
@@ -114,22 +114,22 @@ export default class Overview extends Component {
 
 
       objectLayer = <Overlay key={this.props.level}
-                             checked 
+                             checked
                              name={this.props.title}>
                         <GeoJSON data={this.props.objects}
                                  style={this.getStyleFactory("black")}
                                  onEachFeature={this.props.onEachFeature} />
-                    </Overlay>
+                    </Overlay>;
     }
 
     return <Map className="App-map"
-                center={this.props.center} 
-                ref={map => { this.leafletMap = map; }} 
-                zoom={this.props.zoom} 
-                maxZoom={this.props.maxZoom} 
+                center={this.props.center}
+                ref={map => { this.leafletMap = map; }}
+                zoom={this.props.zoom}
+                maxZoom={this.props.maxZoom}
                 style={this.getMapStyle()}
                 minZoom={this.props.minZoom}
-                onZoom={(e)=>this.handleBoundingBoxChange(e)} 
+                onZoom={(e)=>this.handleBoundingBoxChange(e)}
                 onMoveend={(e)=>this.handleBoundingBoxChange(e)} >
               <TileLayer
                 attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'

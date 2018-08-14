@@ -1,12 +1,12 @@
 .App-container {
-  position:absolute;
   height: 100%;
-  width: 100%;
   overflow: hidden;
+  position:absolute;
+  width: 100%;
 }
 
-.App-map-container{
-}
+/*.App-map-container{*/
+/*}*/
 
 .App-map {
   position:absolute;
@@ -17,20 +17,17 @@
 }
 
 .App-list {
-  position: absolute;
   overflow: scroll;
+  position: absolute;
 }
 
 .App-spinner {
+  left:50%;
   position: fixed;
   top:50%;
-  left:50%;
   transform: translateX(-50%) translateY(-50%);
 }
 
 .hide {
   display: none;
 }
-
-
-
