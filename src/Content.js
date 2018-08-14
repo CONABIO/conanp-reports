@@ -10,6 +10,7 @@ export default class Dropdown extends Component {
   }
 
   getStyleInfo() {
+    // console.log("This is the style info.")
     if(window.innerWidth > breakpoints.desktop) { 
       return {width: "40vw", 
               height: "100vh",
@@ -18,10 +19,12 @@ export default class Dropdown extends Component {
               bottom: "0"};
     } else if(window.innerWidth > breakpoints.tablet){
 
+      // console.log("tablet from content");
       return {width: "100vw",
               height: "50vh",
               bottom: "0"};
     } else {
+      // console.log("mobile");
       return {};
     }
   }

@@ -47,34 +47,40 @@ class App extends Component {
 
   setRegion(data) {
     this.setState({region: data,
-                   regionReady: true});
+      regionReady: true});
   }
 
   setRing(data) {
     this.setState({ring: data,
-                   ringReady: true});
+      ringReady: true});
+    // console.log("ring:");
+    // console.log(this.state.ring);
   }
 
   setPreservation(data) {
     this.setState({preservation: data,
-                   preservationReady: true});
+      preservationReady: true});
+    // console.log("preservation:");
+    // console.log(this.state.preservation);
   }
 
   setKernel(data) {
     this.setState({kernel: data,
-                   kernelReady: true});
+      kernelReady: true});
+    // console.log("kernel:");
+    // console.log(this.state.kernel);
   }
 
   isReady() {
     return this.state.anp != null &&
-           this.state.region != null;
+      this.state.region != null;
   }
 
   isZoomReady() {
-      return this.state.regionReady &&
-             this.state.ringReady &&
-             this.state.preservationReady &&
-             this.state.kernelReady;
+    return this.state.regionReady &&
+      this.state.ringReady &&
+      this.state.preservationReady &&
+      this.state.kernelReady;
   }
 
   getStyleFactory(color){
@@ -106,8 +112,10 @@ class App extends Component {
   }
 
   clickToFeature(e) {
-     let layer = e.target;
-     this.setState({selection:layer.feature, showInfo:true});
+    let layer = e.target;
+    // console.log("Inside click to feature.");
+    // console.log(e);
+    this.setState({selection:layer.feature, showInfo:true});
      this.loadOtherObjects();
   }
 
@@ -137,17 +145,20 @@ class App extends Component {
     this.setState({selection:null,
                    kernel:null,
                    ring:null,
-                   preservation:null,
-                   showInfo:false,
-                   preservationReady: false,
-                   kernelReady: false,
-                   ringReady: false});
+      preservation:null,
+      showInfo:false,
+      preservationReady: false,
+      kernelReady: false,
+      ringReady: false});
     //let leafletBbox = this.state.boundBox;
     //this.leafletMap.leafletElement.fitBounds(leafletBbox);
   }
 
   changeBounds(bounds){
+    // console.log("The bounds are " + bounds);
+    // console.log(bounds);
     this.setState({boundBox: bounds});
+    // console.log(this.state.boundBox);
   }
 
   changeSelection(event){
@@ -219,6 +230,7 @@ class App extends Component {
                                           this.state.ring,
                                           this.state.preservation]} />;
       if(window.innerWidth >= breakpoints.tablet) {
+        // console.log("Not mobile.");
         if(this.state.selection != null){
           if(!this.isZoomReady()) {
             mainContent = <div className='App-spinner'>
@@ -231,22 +243,28 @@ class App extends Component {
                                   />;
           //this.leafletMap.leafletElement.fitBounds(leafletBbox);
         } else {
+          // console.log("This is the content for a tablet or desktop.");
           if(this.state.boundBox != null){
+            // console.log("Getting the list.");
             rightContent = this.getList();
           }
         }
       }
       if(!(window.innerWidth > breakpoints.tablet)) {
+        // console.log("Mobile.");
         dropdown = this.getDropDown();
         if(this.state.selection != null) {
           mainContent = <Content selection={this.state.selection}
                                  handleClick={e=>this.handleCloseInfo(e)}
                                  showInfo={this.state.showInfo}/>;
         } else {
+          // console.log("Nothing selected and mobile.");
         }
 
       }
     } else {
+      // console.log("Not ready yet.");
+
       return <div className='App-spinner'>
                <BounceLoader color='#72a052' />
              </div>;
