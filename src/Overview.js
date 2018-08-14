@@ -13,11 +13,58 @@ export default class Overview extends Component {
     this.leafletMap = null;
     this.changeBounds = this.props.changeBounds;
   }
+  componentWillMount() {
+    let finalMask = null;
+    let leafletBbox = null;
+    let polygons = this.props.selection.filter(element => element!=null);
+    if(polygons.length > 0) {
+      let clonePolygons = polygons.slice(0);
+      let union = clonePolygons.shift();
+      clonePolygons.forEach(function(polygon){
+        // check for kinks in the drawn feature
+        let kinks = turf.kinks(polygon);
+        if(kinks.features.length > 0) {
+          // console.log(polygon);
+          // if there are self-intersections, buffer by 0 to get rid of them
+          polygon = turf.buffer(polygon, 0, {units: "meters"});
+        }
+        union = turf.union(union, polygon);
+      });
+      let bbox = turf.bbox(union);
+      leafletBbox = [[bbox[1], bbox[0]],
+                     [bbox[3], bbox[2]]];
+      
+      let world = turf.flip(turf.polygon([[
+                               [90, -180],
+                               [90, 180],
+                               [-90, 180],
+                               [-90, -180],
+                               [90, -180]
+                            ]]));
+      let mask = turf.difference(world, union);
+      finalMask = turf.flip(mask).geometry.coordinates
+    }
+
+    this.setState({bounds: leafletBbox,
+                   mask: finalMask});
+  }
 
   componentDidMount() {
-    // console.log("Map did mount.");
+    console.log("Map did mount.");
     this.getBoundingBoxFromMap();
-    ;
+    let leafletBbox = this.state.bounds;
+    if(leafletBbox != null) {
+      this.leafletMap.leafletElement.fitBounds(leafletBbox);
+    }
+  }
+
+  comoponentDidUpdate(prevProps) {
+    if (prevProps.selection !== this.props.selection) {
+      console.log("The data changed");
+    }
+    else {
+      console.log("Nofing changed");
+    }
   }
 
   getMapStyle() {
@@ -66,39 +113,9 @@ export default class Overview extends Component {
     let maskLayer = null;
     let polygons = this.props.selection.filter(element => element!=null);
 
+    let finalMask = this.state.mask;
+
     if(polygons.length > 0) {
-      // console.log("Selection is: ");
-      // console.log(polygons);
-
-      let clonePolygons = polygons.slice(0);
-
-      let union = clonePolygons.shift();
-      clonePolygons.forEach(function(polygon){
-        // check for kinks in the drawn feature
-        let kinks = turf.kinks(polygon);
-
-        if(kinks.features.length > 0) {
-          // console.log(polygon);
-          // if there are self-intersections, buffer by 0 to get rid of them
-          polygon = turf.buffer(polygon, 0, {units: "meters"});
-        }
-
-        union = turf.union(union, polygon);
-      });
-      // console.log("Union");
-      // console.log(union);
-
-      let world = turf.flip(turf.polygon([[
-                               [90, -180],
-                               [90, 180],
-                               [-90, 180],
-                               [-90, -180],
-                               [90, -180]
-                            ]]));
-
-      let mask = turf.difference(world, union);
-
-
       objectLayer = polygons.map(function(polygon, index) {
         let tipo = polygon.properties['tipo'];
         return <Overlay key={index}
@@ -111,13 +128,11 @@ export default class Overview extends Component {
       });
 
       maskLayer = <Polygon key={this.props.level}
-                             color="black"
-                             fillOpacity={opacity}
-                             positions={turf.flip(mask).geometry.coordinates} />;
+                           color="black"
+                           fillOpacity={opacity}
+                           positions={finalMask} />;
 
     } else {
-
-
       objectLayer = <Overlay key={this.props.level}
                              checked
                              name={this.props.title}>
