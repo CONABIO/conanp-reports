@@ -15,7 +15,6 @@ export default class Overview extends Component {
   }
 
   componentDidMount() {
-    console.log("Map did mount.");
     this.getBoundingBoxFromMap();
     ;
   }
@@ -68,21 +67,22 @@ export default class Overview extends Component {
     let maskLayer = null;
     let polygons = this.props.selection.filter(element => element!=null);
 
-
-
     if(polygons.length > 0) {
-      console.log("Selection is: ");
-      console.log(polygons);
-
       let clonePolygons = polygons.slice(0);
 
       let union = clonePolygons.shift();
       clonePolygons.forEach(function(polygon){
+        // check for kinks in the drawn feature
+        let kinks = turf.kinks(polygon);
+
+        if(kinks.features.length > 0) {
+          console.log(polygon);
+          // if there are self-intersections, buffer by 0 to get rid of them
+          polygon = turf.buffer(polygon, 0, {units: "meters"});
+        }
+
         union = turf.union(union, polygon);
       });
-      console.log("Union");
-      console.log(union);
-
       let world = turf.flip(turf.polygon([[
                                [90, -180],
                                [90, 180],

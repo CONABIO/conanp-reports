@@ -17,7 +17,6 @@ const NAME = "nombre";
 
 
 function loadUrl(url, callback) {
-  console.log("Loading url.");
   fetch(url,{
       method: "GET",
       mode: "cors",
