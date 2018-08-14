@@ -17,6 +17,7 @@ export default class Overview extends Component {
     let finalMask = null;
     let leafletBbox = null;
     let polygons = this.props.selection.filter(element => element!=null);
+    console.log(polygons);
     if(polygons.length > 0) {
       let clonePolygons = polygons.slice(0);
       let union = clonePolygons.shift();
@@ -30,6 +31,7 @@ export default class Overview extends Component {
         }
         union = turf.union(union, polygon);
       });
+      console.log(union);
       let bbox = turf.bbox(union);
       leafletBbox = [[bbox[1], bbox[0]],
                      [bbox[3], bbox[2]]];
@@ -107,14 +109,10 @@ export default class Overview extends Component {
   }
 
   render() {
-
-
     let objectLayer = null;
     let maskLayer = null;
     let polygons = this.props.selection.filter(element => element!=null);
-
     let finalMask = this.state.mask;
-
     if(polygons.length > 0) {
       objectLayer = polygons.map(function(polygon, index) {
         let tipo = polygon.properties['tipo'];
