@@ -5,7 +5,6 @@ import Dropdown from './Dropdown.js';
 import Overview from './Overview.js';
 import Content from './Content.js';
 import { BounceLoader } from 'react-spinners';
-import { Polygon } from 'react-leaflet';
 import * as turf from '@turf/turf';
 import 'bulma/css/bulma.css';
 
@@ -113,10 +112,7 @@ class App extends Component {
 
   clickToFeature(e) {
     let layer = e.target;
-    // console.log("Inside click to feature.");
-    // console.log(e);
-    this.setState({selection:layer.feature, showInfo:true});
-     this.loadOtherObjects();
+    this.changeSelectionHelper(layer.feature);
   }
 
   getList() {
@@ -132,7 +128,7 @@ class App extends Component {
                       return turf.intersect(boundBoxPolygon, aux) != null;
                     });
     return <List anps={options}
-                 handleClick={e => this.changeSelectionHelper(e)} />;
+                 handleClick={e => this.changeSelection(e)} />;
   }
 
   getDropDown() {
@@ -155,44 +151,43 @@ class App extends Component {
   }
 
   changeBounds(bounds){
-    // console.log("The bounds are " + bounds);
-    // console.log(bounds);
     this.setState({boundBox: bounds});
-    // console.log(this.state.boundBox);
   }
 
-  changeSelection(event){
-    let code = parseInt(event.target.value, 10);
-    this.changeSelectionHelper(code);
-
+  changeSelection(code){
+    let selection = this.getSelectionFromId(code);
+    this.changeSelectionHelper(selection);
   }
 
   handleLevel(level) {
     let title = level === 0 ? "Local":
                 level === 1 ? "Regional":
-                               "Nacional";
+                              "Nacional";
     this.setState({level:level, title:title});
 
   }
 
-  changeSelectionHelper(newSelection) {
-    let currentObjects = this.getCurrentObjects();
-    let selection = null;
+  changeSelectionHelper(feature) {
     let showInfo = false;
+    if(feature != null) {
+      showInfo = true;
+    }
+    this.setState({selection: feature,
+                   showInfo: showInfo,
+                   anpReady: true}, () => this.loadOtherObjects());
+  }
+
+  getSelectionFromId(id) {
+    let selection = null;
+    let currentObjects = this.getCurrentObjects();
     if(currentObjects != null) {
       currentObjects.features.forEach(element => {
-        if(element.properties[CODE] === newSelection){
+        if(element.properties[CODE] === id){
           selection = element;
         }
       });
     }
-    if(selection != null) {
-      showInfo = true;
-      this.loadOtherObjects();
-    }
-    this.setState({selection: selection,
-                   showInfo: showInfo,
-                   anpReady: true});
+    return selection;
   }
 
   loadOtherObjects() {
@@ -218,7 +213,6 @@ class App extends Component {
 
   render() {
     let dropdown = null;
-    let selectedAnp = null;
     let rightContent = null;
     let mainContent = null;
     let shapes = this.getCurrentObjects();

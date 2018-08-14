@@ -29,7 +29,8 @@ export default class List extends Component {
   }
 
   render() {
-    const anps = this.props.anps.map((element, index) => <li key={index}><a onClick={e => this.handleClick(element.properties[CODE])}>{element.properties[NAME]}</a></li>);
+    const anps = this.props.anps.map((element, index) => <li key={index}><a 
+                                                             onClick={e => this.handleClick(element.properties[CODE])}>{element.properties[NAME]}</a></li>);
 
     return <aside className="App-list menu"
                   style={this.getStyleList()} >
