@@ -29,7 +29,7 @@ class App extends Component {
       ringReady: false,
       boundBox: null,
       selection: null,
-      level: 1,
+      level: 0,
       showInfo: false
     };
   }
@@ -209,6 +209,13 @@ class App extends Component {
     }
   }
 
+  getMainContentStyle() {
+    return {
+      width: "60vw",
+      height: "100%"
+    };
+  }
+
   render() {
     let dropdown = null;
     let selectedAnp = null;
@@ -265,8 +272,10 @@ class App extends Component {
     } else {
       // console.log("Not ready yet.");
 
-      return <div className='App-spinner'>
-               <BounceLoader color='#72a052' />
+      return <div className="App-loading">
+               <div className='App-spinner'>
+                 <BounceLoader color='#72a052' />
+               </div>
              </div>;
     }
 
@@ -289,7 +298,7 @@ class App extends Component {
           <div className="App-aside">
             {rightContent}
           </div>
-          <div className={"App-map-container"}>
+          <div className={"App-map-container"} style={this.getMainContentStyle()}>
             {mainContent}
           </div>
         </div>
