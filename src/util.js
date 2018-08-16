@@ -39,11 +39,11 @@ function loadUrl(url, callback) {
 }
 
 function getColor(type) {
-  return type === "anillo"       ? "yellow":
-         type === "anp"          ? "blue":
-         type === "nucleo"       ? "green":
-         type === "preservacion" ? "red":
-                                   "white";
+  return (
+    type === "anillo" ? "yellow":
+      type === "anp" ? "blue":
+        type === "nucleo" ? "green":
+          type === "preservacion" ? "red": "white");
 }
 
 export { breakpoints,
@@ -54,7 +54,7 @@ export { breakpoints,
   KERNEL_URL,
   RING_URL,
   PRESERVATION_URL,
-  REGIONS_CODE, 
+  REGIONS_CODE,
   REGIONS_NAME,
-  CODE, 
+  CODE,
   NAME };
