@@ -115,7 +115,7 @@ class App extends Component {
   /**
    * This will be called when the origin of the event is
    * the click on an element in the list. It will obtain the
-   * selected feature from the list element id, and call the 
+   * selected feature from the list element id, and call the
    * helper function.
    **/
   changeSelection(code){
@@ -159,7 +159,7 @@ class App extends Component {
   }
 
   changeBounds(bounds){
-    console.log("The new bounds are:")
+    console.log("The new bounds are:");
     console.log(bounds);
 
     this.setState({boundBox: bounds});

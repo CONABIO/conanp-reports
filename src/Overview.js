@@ -35,7 +35,7 @@ export default class Overview extends Component {
       let bbox = turf.bbox(union);
       leafletBbox = [[bbox[1], bbox[0]],
                      [bbox[3], bbox[2]]];
-      
+
       let world = turf.flip(turf.polygon([[
                                [90, -180],
                                [90, 180],
@@ -44,7 +44,7 @@ export default class Overview extends Component {
                                [90, -180]
                             ]]));
       let mask = turf.difference(world, union);
-      finalMask = turf.flip(mask).geometry.coordinates
+      finalMask = turf.flip(mask).geometry.coordinates;
     }
 
     this.setState({bounds: leafletBbox,
