@@ -11,17 +11,19 @@ export default class List extends Component {
 
   getStyleList() {
     if(window.innerWidth >= breakpoints.desktop) {
-      return {width: "40vw",
-              height: "100vh",
-              right: "0",
-              top: "0",
-              bottom: "0"};
+      return {
+        width: "40vw",
+        height: "100vh",
+        right: "0",
+        top: "0",
+        bottom: "0"};
     } else if(window.innerWidth >= breakpoints.tablet) {
-      return {width: "100vw",
-              height: "100vh",
-              right: "0",
-              top: "0",
-              bottom: "0"};
+      return {
+        width: "100vw",
+        height: "100vh",
+        right: "0",
+        top: "0",
+        bottom: "0"};
     }
     else {
       return {display:"none"};
@@ -29,17 +31,22 @@ export default class List extends Component {
   }
 
   render() {
-    const anps = this.props.anps.map((element, index) => <li key={index}><a 
-                                                             onClick={e => this.handleClick(element.properties[CODE])}>{element.properties[NAME]}</a></li>);
+    const anps = this.props.anps.map(
+      (element, index) => (
+        <li key={index}>
+          <a onClick={() => this.handleClick(element.properties[CODE])}>
+            {element.properties[NAME]}
+          </a>
+        </li>));
 
-    return <aside className="App-list menu"
-                  style={this.getStyleList()} >
-             <p className="menu-label">
-               Areas Naturales Protegidas
-             </p>
-             <ul className="menu-list">
-               {anps}
-             </ul>
-           </aside>;
+    return (
+      <aside className="App-list menu" style={this.getStyleList()}>
+        <p className="menu-label">
+          Areas Naturales Protegidas
+        </p>
+        <ul className="menu-list">
+          {anps}
+        </ul>
+      </aside>);
   }
 }
