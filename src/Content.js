@@ -21,7 +21,7 @@ export default class Dropdown extends Component {
   }
 
   setData(data) {
-    this.setState({data: data["anp_terrestres_2017_NOMBRE_Sacromonte_ring"], dataReady:true});
+    this.setState({data: data, dataReady:true});
   }
 
   getStyleInfo() {
@@ -29,7 +29,8 @@ export default class Dropdown extends Component {
     if (window.innerWidth > breakpoints.desktop) {
       return {
         width: "40vw",
-        height: "100vh",
+        maxHeight: "calc(100vh -  3.25rem)",
+        overflow: "auto",
         right: "0",
         top: "0",
         bottom: "0"};
@@ -55,66 +56,96 @@ export default class Dropdown extends Component {
 
   render() {
 
-    let length = 50;
-    let y0 = new Array(length);
-    let y1 = new Array(length);
+    let traceAnp1,
+        traceAnp2,
+        traceAnp3,
+        traceAnp4,
+        traceAnp5,
+        traceAnp6,
+        traceAnp7;
 
-    for (let i = 0; i < length; i ++) {
-        y0[i] = Math.random();
-        y1[i] = Math.random() + 1;
-    }
-    
-    let trace1 = {
-      y: y0,
-      type: 'box'
-    };
-    
-    let trace2 = {
-      y: y1,
-      type: 'box'
-    };
+    let traceRing1,
+        traceRing2,
+        traceRing3,
+        traceRing4,
+        traceRing5,
+        traceRing6,
+        traceRing7;
 
-    let trace3, trace4, trace5, trace6, trace7;
+    let name = null;
 
     if(this.state.dataReady) {
-      trace1 = {
-        y: this.state.data["anio_2008"],
+
+      name = this.state.data["nombre"];
+
+      traceAnp1 = {
+        y: this.state.data["anp"]["anio_2008"],
         type: 'box',
         name: 'Año 2008',
-        jitter: 0.3,
-        pointpos: -1.8,
-        marker: {
-          color: 'rgb(7,40,89)'
-        },
-        boxpoints: 'Outliers'
       };
-      trace2 = {
-        y: this.state.data["anio_2009"],
+      traceAnp2 = {
+        y: this.state.data["anp"]["anio_2009"],
         type: 'box',
         name: 'Año 2009'
       };
-      trace3 = {
-        y: this.state.data["anio_2010"],
+      traceAnp3 = {
+        y: this.state.data["anp"]["anio_2010"],
         type: 'box',
         name: 'Año 2010'
       };
-      trace4 = {
-        y: this.state.data["anio_2011"],
+      traceAnp4 = {
+        y: this.state.data["anp"]["anio_2011"],
         type: 'box',
         name: 'Año 2011'
       };
-      trace5 = {
-        y: this.state.data["anio_2012"],
+      traceAnp5 = {
+        y: this.state.data["anp"]["anio_2012"],
         type: 'box',
         name: 'Año 2012'
       };
-      trace6 = {
-        y: this.state.data["anio_2013"],
+      traceAnp6 = {
+        y: this.state.data["anp"]["anio_2013"],
         type: 'box',
         name: 'Año 2013'
       };
-      trace7 = {
-        y: this.state.data["anio_2014"],
+      traceAnp7 = {
+        y: this.state.data["anp"]["anio_2014"],
+        type: 'box',
+        name: 'Año 2014'
+      };
+
+      traceRing1 = {
+        y: this.state.data["ring"]["anio_2008"],
+        type: 'box',
+        name: 'Año 2008',
+      };
+      traceRing2 = {
+        y: this.state.data["ring"]["anio_2009"],
+        type: 'box',
+        name: 'Año 2009'
+      };
+      traceRing3 = {
+        y: this.state.data["ring"]["anio_2010"],
+        type: 'box',
+        name: 'Año 2010'
+      };
+      traceRing4 = {
+        y: this.state.data["ring"]["anio_2011"],
+        type: 'box',
+        name: 'Año 2011'
+      };
+      traceRing5 = {
+        y: this.state.data["ring"]["anio_2012"],
+        type: 'box',
+        name: 'Año 2012'
+      };
+      traceRing6 = {
+        y: this.state.data["ring"]["anio_2013"],
+        type: 'box',
+        name: 'Año 2013'
+      };
+      traceRing7 = {
+        y: this.state.data["ring"]["anio_2014"],
         type: 'box',
         name: 'Año 2014'
       };
@@ -126,13 +157,20 @@ export default class Dropdown extends Component {
           {this.props.selection == null?"":this.props.selection.properties[NAME]}
           {this.renderButton()}
         </div>
-        <div className="message-body max-height">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque risus mi, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum felis venenatis efficitur. Aenean ac eleifend lacus, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
+        <div className="message-body container" style={{overflow: "scroll"}}>
+          <h1>{name}</h1>
+          <h2>Información de anp</h2>
+          <Plot
+            data={[traceAnp1, traceAnp2, traceAnp3, traceAnp4, traceAnp5, traceAnp6, traceAnp7]}
+            layout={ {width: "300px", title: 'A Box Plot'} }
+          />
+          <h2>Información de anillo</h2>
+          <Plot
+            data={[traceRing1, traceRing2, traceRing3, traceRing4, traceRing5, traceRing6, traceRing7]}
+            layout={ {title: 'A Box Plot'} }
+          />
         </div>
-        <Plot
-          data={[trace1, trace2, trace3, trace4, trace5, trace6, trace7]}
-          layout={ {width: "100%", title: 'A Box Plot'} }
-        />
+        
       </article>);
   }
 }
