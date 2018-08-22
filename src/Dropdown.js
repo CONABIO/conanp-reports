@@ -14,7 +14,7 @@ export default class Dropdown extends Component {
         {element.properties[NAME]}
       </option>));
     return (
-      <div className="select">
+      <div className="">
         <select onChange={e=>this.handleClick(e)}>{anps}</select>
       </div>);
   }

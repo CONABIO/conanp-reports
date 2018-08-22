@@ -1,15 +1,16 @@
 .App-container {
-  height: 100%;
+  height: calc(100% - 3.25rem);
   overflow: hidden;
   position: absolute;
   width: 100%;
 }
 
-/*.App-map-container{*/
-/*}*/
-
 .App-map {
   position:absolute;
+}
+
+.App-aside {
+  width: 50%;
 }
 
 .App-info {

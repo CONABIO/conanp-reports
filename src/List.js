@@ -40,11 +40,11 @@ export default class List extends Component {
         </li>));
 
     return (
-      <aside className="App-list menu" style={this.getStyleList()}>
-        <p className="menu-label">
+      <aside className="App-list" style={this.getStyleList()}>
+        <p className="">
           Areas Naturales Protegidas
         </p>
-        <ul className="menu-list">
+        <ul className="">
           {anps}
         </ul>
       </aside>);

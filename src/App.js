@@ -6,7 +6,6 @@ import Overview from './Overview.js';
 import Content from './Content.js';
 import { BounceLoader } from 'react-spinners';
 import * as turf from '@turf/turf';
-import 'bulma/css/bulma.css';
 
 import { breakpoints, loadUrl, CODE, ANPS_URL, REGIONS_URL, KERNEL_URL, PRESERVATION_URL, RING_URL } from './util.js';
 
@@ -302,11 +301,11 @@ class App extends Component {
 
     return (
       <div>
-        <nav className="navbar" aria-label="main navigation">
-          <div className="navbar-brand">
-            <a className="navbar-item">Reportes CONANP</a>
+        <nav className="" aria-label="main navigation">
+          <div className="">
+            <a className="">Reportes CONANP</a>
           </div>
-          <div className="navbar-item tabs is-right is-toggle is-toggle-rounded">
+          <div className="">
             <ul>
               <li onClick={()=>this.handleLevel(0)} className={this.state.level === 0 ? "is-active": ""}><a>Local</a></li>
               <li onClick={()=>this.handleLevel(1)} className={this.state.level === 1 ? "is-active": ""}><a>Regional</a></li>

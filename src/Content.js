@@ -152,22 +152,28 @@ export default class Dropdown extends Component {
     }
 
     return (
-      <article className={"App-info message is-info"} style={this.getStyleInfo()}>
-        <div className="message-header">
+      <article className={"App-info"} style={this.getStyleInfo()}>
+        <div className="">
           {this.props.selection == null?"":this.props.selection.properties[NAME]}
           {this.renderButton()}
         </div>
-        <div className="message-body container" style={{overflow: "scroll"}}>
+        <div className="" style={{overflow: "scroll"}}>
           <h1>{name}</h1>
           <h2>Información de anp</h2>
           <Plot
+            style={{ width:"100%" }}
+            useResizeHandler
             data={[traceAnp1, traceAnp2, traceAnp3, traceAnp4, traceAnp5, traceAnp6, traceAnp7]}
-            layout={ {width: "300px", title: 'A Box Plot'} }
+            layout={ {autosize: "true", title: 'Area Natural Protegida'} }
+            config={ {displayModeBar: false} }
           />
           <h2>Información de anillo</h2>
           <Plot
+            style={{ width:"100%" }}
+            useResizeHandler
             data={[traceRing1, traceRing2, traceRing3, traceRing4, traceRing5, traceRing6, traceRing7]}
-            layout={ {title: 'A Box Plot'} }
+            layout={ {autosize: "true", title: 'Anillo'} }
+            config={ {displayModeBar: false} }
           />
         </div>
         
