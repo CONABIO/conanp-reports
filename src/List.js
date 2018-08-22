@@ -10,6 +10,7 @@ export default class List extends Component {
   }
 
   getStyleList() {
+    /**
     if(window.innerWidth >= breakpoints.desktop) {
       return {
         width: "40vw",
@@ -28,6 +29,7 @@ export default class List extends Component {
     else {
       return {display:"none"};
     }
+    **/
   }
 
   render() {
@@ -40,7 +42,7 @@ export default class List extends Component {
         </li>));
 
     return (
-      <aside className="App-list" style={this.getStyleList()}>
+      <aside className="List" style={this.getStyleList()}>
         <p className="">
           Areas Naturales Protegidas
         </p>

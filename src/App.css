@@ -1,25 +1,32 @@
-.App-container {
-  height: calc(100% - 3.25rem);
-  overflow: hidden;
-  position: absolute;
-  width: 100%;
+.App {
+  display:grid;
+  grid-template-rows: 100px auto;
+  grid-template-columns: 100%;
+  grid-template-areas: "header header"
+                       "container container";
 }
 
-.App-map {
-  position:absolute;
+.App-header {
+  grid-area: header;
+}
+
+.App-container {
+  grid-area: container;
+  height: calc(100vh - 100px);
+  display: flex;
+}
+
+.App-map-container {
+  flex: 3;
+  order: 1;
+  position: relative;
 }
 
 .App-aside {
-  width: 50%;
-}
-
-.App-info {
-  position: absolute;
-}
-
-.App-list {
-  overflow: scroll;
-  position: absolute;
+  flex: 2;
+  order: 2;
+  overflow: auto;
+  background-color: red;
 }
 
 .App-loading {
@@ -33,7 +40,6 @@
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
 }
-
 
 .App-spinner-map {
 

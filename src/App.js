@@ -218,10 +218,12 @@ class App extends Component {
   }
 
   getMainContentStyle() {
+    /**
     return {
       width: "60vw",
       height: "100%"
     };
+    **/
   }
 
   render() {
@@ -248,49 +250,32 @@ class App extends Component {
           this.state.ring,
           this.state.preservation]}
       />;
-
-      if(window.innerWidth >= breakpoints.tablet) {
-        // console.log("Not mobile.");
-        if(this.state.selection != null){
-          if(!this.isZoomReady()) {
-            mainContent = (
-              <div className='App-spinner'>
-                <BounceLoader color='#72a052' />
-              </div>);
-          }
-
-          rightContent = (
-            <Content
-              selection={this.state.selection}
-              handleClick={e=>this.handleCloseInfo(e)}
-              showInfo={this.state.showInfo}
-            />);
-          //this.leafletMap.leafletElement.fitBounds(leafletBbox);
-        } else {
-          // console.log("This is the content for a tablet or desktop.");
-          if(this.state.boundBox != null){
-            // console.log("Getting the list.");
-            rightContent = this.getList();
-          }
+      if(this.state.selection != null){
+        if(!this.isZoomReady()) {
+          mainContent = (
+            <div className='App-spinner'>
+              <BounceLoader color='#72a052' />
+            </div>);
         }
-      }
-      if(!(window.innerWidth > breakpoints.tablet)) {
-        // console.log("Mobile.");
-        dropdown = this.getDropDown();
-        if(this.state.selection != null) {
-          mainContent = <Content
+        rightContent = (
+          <Content
             selection={this.state.selection}
             handleClick={e=>this.handleCloseInfo(e)}
             showInfo={this.state.showInfo}
-          />;
-        } else {
-          // console.log("Nothing selected and mobile.");
+          />);
+      } else {
+        if(this.state.boundBox != null){
+          if(window.innerWidth >= breakpoints.tablet) {
+            rightContent = this.getList();
+          }
+          else {
+            dropdown = this.getDropDown();
+          }
         }
-
       }
-    } else {
-      // console.log("Not ready yet.");
 
+    } else {
+      // Not ready yet.
       return (
         <div className="App-loading">
           <div className='App-spinner'>
@@ -300,8 +285,8 @@ class App extends Component {
     }
 
     return (
-      <div>
-        <nav className="" aria-label="main navigation">
+      <div className="App">
+        <nav className="App-header" aria-label="main navigation">
           <div className="">
             <a className="">Reportes CONANP</a>
           </div>
@@ -316,9 +301,11 @@ class App extends Component {
         </nav>
         <div className="App-container">
           <div className="App-aside">
+            <p>Aside</p>
             {rightContent}
           </div>
           <div className={"App-map-container"} style={this.getMainContentStyle()}>
+            <p>Map</p>
             {mainContent}
           </div>
         </div>

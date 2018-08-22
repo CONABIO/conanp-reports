@@ -1,3 +1,8 @@
 li {
   cursor: pointer;
 }
+
+.List {
+  min-height: -webkit-min-content;
+  min-height: min-content;
+}

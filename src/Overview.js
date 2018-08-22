@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
 import { breakpoints, getColor } from './util.js';
 import * as turf from '@turf/turf';
+import './Overview.css';
 
 const { BaseLayer, Overlay } = LayersControl;
 const opacity = 0.7;
@@ -77,6 +78,7 @@ export default class Overview extends Component {
   }
 
   getMapStyle() {
+    /**
     if(window.innerWidth > breakpoints.desktop) {
       return {
         width: "60vw",
@@ -94,6 +96,7 @@ export default class Overview extends Component {
         top: "0",
         bottom: "0"};
     }
+    **/
   }
 
   handleBoundingBoxChange() {
@@ -159,7 +162,7 @@ export default class Overview extends Component {
 
     return (
       <Map
-        className="App-map"
+        className="Overview"
         center={this.props.center}
         ref={map => { this.leafletMap = map; }}
         zoom={this.props.zoom}

@@ -25,6 +25,7 @@ export default class Dropdown extends Component {
   }
 
   getStyleInfo() {
+    /**
     // console.log("This is the style info.")
     if (window.innerWidth > breakpoints.desktop) {
       return {
@@ -42,8 +43,11 @@ export default class Dropdown extends Component {
         bottom: "0"};
     } else {
       // console.log("mobile");
-      return {};
+      return {
+        display: "hidden"
+      };
     }
+    **/
   }
 
   renderButton(){
