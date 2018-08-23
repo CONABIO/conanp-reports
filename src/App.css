@@ -14,20 +14,30 @@
   grid-area: container;
   height: calc(100vh - 100px);
   display: flex;
+  flex-direction: column;
 }
 
 .App-map-container {
-  flex: 3;
+  flex: 1;
   order: 1;
   position: relative;
 }
 
+.App-map-container.selection {
+  flex: 0;
+}
+
 .App-aside {
-  flex: 2;
+  flex: 0;
   order: 2;
   overflow: auto;
   background-color: red;
 }
+
+.App-aside.selection {
+  flex: 1;
+}
+
 
 .App-loading {
   width: 100vw;
@@ -47,4 +57,32 @@
 
 .hide {
   display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .App-container {
+    flex-direction: column;
+  }
+
+  .App-map-container {
+    flex: 1;
+  }
+  
+  .App-aside {
+    flex: 1;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .App-container {
+    flex-direction: row;
+  }
+
+  .App-map-container {
+    flex: 3;
+  }
+  
+  .App-aside {
+    flex: 2;
+  }
 }

@@ -300,7 +300,7 @@ class App extends Component {
           <span className="navbar-item">{dropdown}</span>
         </nav>
         <div className="App-container">
-          <div className="App-aside">
+          <div className={"App-aside"}>
             <p>Aside</p>
             {rightContent}
           </div>
