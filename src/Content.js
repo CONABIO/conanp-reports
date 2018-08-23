@@ -24,32 +24,6 @@ export default class Dropdown extends Component {
     this.setState({data: data, dataReady:true});
   }
 
-  getStyleInfo() {
-    /**
-    // console.log("This is the style info.")
-    if (window.innerWidth > breakpoints.desktop) {
-      return {
-        width: "40vw",
-        maxHeight: "calc(100vh -  3.25rem)",
-        overflow: "auto",
-        right: "0",
-        top: "0",
-        bottom: "0"};
-    } else if (window.innerWidth > breakpoints.tablet) {
-      // console.log("tablet from content");
-      return {
-        width: "100vw",
-        height: "50vh",
-        bottom: "0"};
-    } else {
-      // console.log("mobile");
-      return {
-        display: "hidden"
-      };
-    }
-    **/
-  }
-
   renderButton(){
     let button = null;
     if(this.props.showInfo) {
@@ -151,7 +125,7 @@ export default class Dropdown extends Component {
       traceRing7 = {
         y: this.state.data["ring"]["anio_2014"],
         type: 'box',
-        name: 'Año 2014'
+        name: 'Año 2013'
       };
     }
 
@@ -180,7 +154,6 @@ export default class Dropdown extends Component {
             config={ {displayModeBar: false} }
           />
         </div>
-        
       </article>);
   }
 }

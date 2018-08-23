@@ -9,29 +9,6 @@ export default class List extends Component {
     this.handleClick = this.props.handleClick;
   }
 
-  getStyleList() {
-    /**
-    if(window.innerWidth >= breakpoints.desktop) {
-      return {
-        width: "40vw",
-        height: "100vh",
-        right: "0",
-        top: "0",
-        bottom: "0"};
-    } else if(window.innerWidth >= breakpoints.tablet) {
-      return {
-        width: "100vw",
-        height: "100vh",
-        right: "0",
-        top: "0",
-        bottom: "0"};
-    }
-    else {
-      return {display:"none"};
-    }
-    **/
-  }
-
   render() {
     const anps = this.props.anps.map(
       (element, index) => (
@@ -42,7 +19,7 @@ export default class List extends Component {
         </li>));
 
     return (
-      <aside className="List" style={this.getStyleList()}>
+      <aside className="List">
         <p className="">
           Areas Naturales Protegidas
         </p>

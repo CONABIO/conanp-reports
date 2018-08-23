@@ -77,28 +77,6 @@ export default class Overview extends Component {
     }
   }
 
-  getMapStyle() {
-    /**
-    if(window.innerWidth > breakpoints.desktop) {
-      return {
-        width: "60vw",
-        height: "100vh"};
-
-    } else if(window.innerWidth > breakpoints.tablet){
-      return {
-        width: "100vw",
-        height: "50vh"};
-
-    } else {
-      return {
-        right: "0",
-        left: "0",
-        top: "0",
-        bottom: "0"};
-    }
-    **/
-  }
-
   handleBoundingBoxChange() {
     this.getBoundingBoxFromMap();
   }

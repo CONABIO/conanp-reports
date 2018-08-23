@@ -217,15 +217,6 @@ class App extends Component {
     }
   }
 
-  getMainContentStyle() {
-    /**
-    return {
-      width: "60vw",
-      height: "100%"
-    };
-    **/
-  }
-
   render() {
     let dropdown = null;
     let rightContent = null;
@@ -304,7 +295,7 @@ class App extends Component {
             <p>Aside</p>
             {rightContent}
           </div>
-          <div className={"App-map-container"} style={this.getMainContentStyle()}>
+          <div className={"App-map-container"}>
             <p>Map</p>
             {mainContent}
           </div>
