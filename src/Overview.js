@@ -145,7 +145,6 @@ export default class Overview extends Component {
         ref={map => { this.leafletMap = map; }}
         zoom={this.props.zoom}
         maxZoom={this.props.maxZoom}
-        style={this.getMapStyle()}
         minZoom={this.props.minZoom}
         onZoom={(e)=>this.handleBoundingBoxChange(e)}
         onMoveend={(e)=>this.handleBoundingBoxChange(e)}

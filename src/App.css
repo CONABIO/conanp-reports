@@ -6,6 +6,8 @@
                        "container container";
 }
 
+
+
 .App-header {
   grid-area: header;
 }
@@ -13,30 +15,8 @@
 .App-container {
   grid-area: container;
   height: calc(100vh - 100px);
-  display: flex;
-  flex-direction: column;
 }
 
-.App-map-container {
-  flex: 1;
-  order: 1;
-  position: relative;
-}
-
-.App-map-container.selection {
-  flex: 0;
-}
-
-.App-aside {
-  flex: 0;
-  order: 2;
-  overflow: auto;
-  background-color: red;
-}
-
-.App-aside.selection {
-  flex: 1;
-}
 
 .App-loading {
   width: 100vw;
@@ -54,25 +34,65 @@
 
 }
 
-.hide {
-  display: none;
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.App-header ul{
+  list-style-type: none;
+}
+
+.App-header li {
+  display:inline;
+  padding: 5px;
+}
+
+
+@media screen and (max-width: 768px) {
+  .App-map-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    transform: translateX(0vw);
+  }
+  
+  .App-map-container.selection {
+    transform: translateX(-100vw);
+  }
+  
+  .App-aside {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    transform: translateX(100vw);
+  }
+  
+  .App-aside.selection {
+    transform: translateX(0vw);
+  }
 }
 
 
 @media screen and (min-width: 768px) {
   .App-container {
+    display: flex;
     flex-direction: column;
   }
 
   .App-map-container {
     flex: 1;
+    order: 1;
+    position: relative;
   }
   
   .App-aside {
+    overflow: auto;
     flex: 1;
+    order: 2;
   }
 }
-
 @media screen and (min-width: 992px) {
   .App-container {
     flex-direction: row;

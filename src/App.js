@@ -281,6 +281,7 @@ class App extends Component {
           <div className="">
             <a className="">Reportes CONANP</a>
           </div>
+          <span className="navbar-item">{dropdown}</span>
           <div className="">
             <ul>
               <li onClick={()=>this.handleLevel(0)} className={this.state.level === 0 ? "is-active": ""}><a>Local</a></li>
@@ -288,14 +289,13 @@ class App extends Component {
               <li className={this.state.level === 2 ? "is-active": ""}><a>Nacional</a></li>
             </ul>
           </div>
-          <span className="navbar-item">{dropdown}</span>
         </nav>
         <div className="App-container">
-          <div className={"App-aside"}>
+          <div className={"App-aside" + (this.state.selection != null?" selection":"")}>
             <p>Aside</p>
             {rightContent}
           </div>
-          <div className={"App-map-container"}>
+          <div className={"App-map-container" + (this.state.selection != null?" selection":"")}>
             <p>Map</p>
             {mainContent}
           </div>

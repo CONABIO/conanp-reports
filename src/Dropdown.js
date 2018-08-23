@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import './Dropdown.css';
 import { CODE, NAME } from './util.js';
 
 export default class Dropdown extends Component {
@@ -14,7 +14,7 @@ export default class Dropdown extends Component {
         {element.properties[NAME]}
       </option>));
     return (
-      <div className="">
+      <div className="Dropdown">
         <select onChange={e=>this.handleClick(e)}>{anps}</select>
       </div>);
   }

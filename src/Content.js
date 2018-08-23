@@ -130,7 +130,7 @@ export default class Dropdown extends Component {
     }
 
     return (
-      <article className={"App-info"} style={this.getStyleInfo()}>
+      <article className={"App-info"}>
         <div className="">
           {this.props.selection == null?"":this.props.selection.properties[NAME]}
           {this.renderButton()}
