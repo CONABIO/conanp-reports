@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 import { breakpoints, NAME } from './util.js';
-import { loadUrl } from './util.js';
+import { loadUrl, BOX_PLOTS_URL } from './util.js';
 
 export default class Dropdown extends Component {
 
@@ -15,13 +15,18 @@ export default class Dropdown extends Component {
   }
 
   componentDidMount() {
-    console.log("Content will mount.")
-    loadUrl("http://localhost:8080/data_anps.json", 
-                this.setData.bind(this));
+    console.log("Content will mount.");
+
+
+    let id = this.props.selection.properties.id_07;
+    let url = BOX_PLOTS_URL + id;
+    url = "http://snmb.conabio.gob.mx/api_anps/v1/idoneidad/40"
+    console.log(url);
+    loadUrl(url, this.setData.bind(this));
   }
 
   setData(data) {
-    this.setState({data: data, dataReady:true});
+    this.setState({data: data["chart"], dataReady:true});
   }
 
   renderButton(){
@@ -51,82 +56,49 @@ export default class Dropdown extends Component {
         traceRing7;
 
     let name = null;
+    let plotAnp = null;
+    let plotRing = null;
 
-    if(this.state.dataReady) {
+    if(this.state.dataReady && this.state.data != null) {
+      let anpData = [];
+      let ringData = [];
 
-      name = this.state.data["nombre"];
+      console.log(this.state.data)
 
-      traceAnp1 = {
-        y: this.state.data["anp"]["anio_2008"],
-        type: 'box',
-        name: 'Año 2008',
-      };
-      traceAnp2 = {
-        y: this.state.data["anp"]["anio_2009"],
-        type: 'box',
-        name: 'Año 2009'
-      };
-      traceAnp3 = {
-        y: this.state.data["anp"]["anio_2010"],
-        type: 'box',
-        name: 'Año 2010'
-      };
-      traceAnp4 = {
-        y: this.state.data["anp"]["anio_2011"],
-        type: 'box',
-        name: 'Año 2011'
-      };
-      traceAnp5 = {
-        y: this.state.data["anp"]["anio_2012"],
-        type: 'box',
-        name: 'Año 2012'
-      };
-      traceAnp6 = {
-        y: this.state.data["anp"]["anio_2013"],
-        type: 'box',
-        name: 'Año 2013'
-      };
-      traceAnp7 = {
-        y: this.state.data["anp"]["anio_2014"],
-        type: 'box',
-        name: 'Año 2014'
-      };
+      this.state.data.forEach(function(element) {
+        if(element["tipo"] == "Anillo") {
+          ringData.push({y: element["idoneidad"],
+                     type: 'box',
+                     nombre: "'Año " + element["anio"]
+                    });
+        }
 
-      traceRing1 = {
-        y: this.state.data["ring"]["anio_2008"],
-        type: 'box',
-        name: 'Año 2008',
-      };
-      traceRing2 = {
-        y: this.state.data["ring"]["anio_2009"],
-        type: 'box',
-        name: 'Año 2009'
-      };
-      traceRing3 = {
-        y: this.state.data["ring"]["anio_2010"],
-        type: 'box',
-        name: 'Año 2010'
-      };
-      traceRing4 = {
-        y: this.state.data["ring"]["anio_2011"],
-        type: 'box',
-        name: 'Año 2011'
-      };
-      traceRing5 = {
-        y: this.state.data["ring"]["anio_2012"],
-        type: 'box',
-        name: 'Año 2012'
-      };
-      traceRing6 = {
-        y: this.state.data["ring"]["anio_2013"],
-        type: 'box',
-        name: 'Año 2013'
-      };
-      traceRing7 = {
-        y: this.state.data["ring"]["anio_2014"],
-        type: 'box',
-        name: 'Año 2013'
-      };
+        if(element["tipo"] == "ANP") {
+          anpData.push({y: element["idoneidad"],
+                     type: 'box',
+                     nombre: "'Año " + element["anio"]
+                    });
+        }
+      });
+
+      console.log(anpData);
+
+      plotAnp = <Plot
+        style={{ width:"100%" }}
+        useResizeHandler
+        data={anpData}
+        layout={ {autosize: "true", title: 'Area Natural Protegida'} }
+        config={ {displayModeBar: false} }
+      />
+
+      plotRing = <Plot
+        style={{ width:"100%" }}
+        useResizeHandler
+        data={ringData}
+        layout={ {autosize: "true", title: 'Area Natural Protegida'} }
+        config={ {displayModeBar: false} }
+      />
+
     }
 
     return (
@@ -138,21 +110,9 @@ export default class Dropdown extends Component {
         <div className="" style={{overflow: "scroll"}}>
           <h1>{name}</h1>
           <h2>Información de anp</h2>
-          <Plot
-            style={{ width:"100%" }}
-            useResizeHandler
-            data={[traceAnp1, traceAnp2, traceAnp3, traceAnp4, traceAnp5, traceAnp6, traceAnp7]}
-            layout={ {autosize: "true", title: 'Area Natural Protegida'} }
-            config={ {displayModeBar: false} }
-          />
+          {plotAnp}
           <h2>Información de anillo</h2>
-          <Plot
-            style={{ width:"100%" }}
-            useResizeHandler
-            data={[traceRing1, traceRing2, traceRing3, traceRing4, traceRing5, traceRing6, traceRing7]}
-            layout={ {autosize: "true", title: 'Anillo'} }
-            config={ {displayModeBar: false} }
-          />
+          {plotRing}
         </div>
       </article>);
   }

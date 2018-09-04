@@ -9,6 +9,7 @@ const REGIONS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/regiones";
 const KERNEL_URL = "http://snmb.conabio.gob.mx/api_anps/v1/nucleo/";
 const RING_URL = "http://snmb.conabio.gob.mx/api_anps/v1/anillo/";
 const PRESERVATION_URL = "http://snmb.conabio.gob.mx/api_anps/v1/preservacion/";
+const BOX_PLOTS_URL = "http://snmb.conabio.gob.mx/api_anps/v1/idoneidad/"
 
 const REGIONS_CODE = "objectid";
 const CODE = "id_07";
@@ -47,14 +48,15 @@ function getColor(type) {
 }
 
 export { breakpoints,
-  getColor,
-  loadUrl,
-  ANPS_URL,
-  REGIONS_URL,
-  KERNEL_URL,
-  RING_URL,
-  PRESERVATION_URL,
-  REGIONS_CODE,
-  REGIONS_NAME,
-  CODE,
-  NAME };
+         getColor,
+         loadUrl,
+         ANPS_URL,
+         REGIONS_URL,
+         KERNEL_URL,
+         RING_URL,
+         PRESERVATION_URL,
+         REGIONS_CODE,
+         REGIONS_NAME,
+         CODE,
+         NAME,
+         BOX_PLOTS_URL };

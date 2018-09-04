@@ -6,8 +6,6 @@
                        "container container";
 }
 
-
-
 .App-header {
   grid-area: header;
 }
@@ -16,7 +14,6 @@
   grid-area: container;
   height: calc(100vh - 100px);
 }
-
 
 .App-loading {
   width: 100vw;
@@ -33,7 +30,6 @@
 .App-spinner-map {
 
 }
-
 
 .App-header {
   display: flex;
