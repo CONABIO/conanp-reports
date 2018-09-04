@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Map, TileLayer, LayersControl, WMSTileLayer, GeoJSON, Polygon } from 'react-leaflet';
-import { breakpoints, getColor } from './util.js';
+import { getColor } from './util.js';
 import * as turf from '@turf/turf';
 import './Overview.css';
 
