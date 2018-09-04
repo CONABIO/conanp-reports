@@ -16,12 +16,8 @@ export default class Dropdown extends Component {
 
   componentDidMount() {
     console.log("Content will mount.");
-
-
     let id = this.props.selection.properties.id_07;
     let url = BOX_PLOTS_URL + id;
-    url = "http://snmb.conabio.gob.mx/api_anps/v1/idoneidad/40"
-    console.log(url);
     loadUrl(url, this.setData.bind(this));
   }
 
@@ -63,20 +59,18 @@ export default class Dropdown extends Component {
       let anpData = [];
       let ringData = [];
 
-      console.log(this.state.data)
-
       this.state.data.forEach(function(element) {
         if(element["tipo"] == "Anillo") {
           ringData.push({y: element["idoneidad"],
                      type: 'box',
-                     nombre: "'Año " + element["anio"]
+                     name: "'Año " + element["anio"]
                     });
         }
 
         if(element["tipo"] == "ANP") {
           anpData.push({y: element["idoneidad"],
                      type: 'box',
-                     nombre: "'Año " + element["anio"]
+                     name: "'Año " + element["anio"]
                     });
         }
       });

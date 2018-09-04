@@ -113,7 +113,7 @@ export default class Overview extends Component {
           <Overlay key={index} checked name={tipo}>
             <Polygon
               color={getColor(tipo)}
-              fillOpacity={opacity}
+              fillOpacity={0}
               positions={turf.flip(polygon).geometry.coordinates}
             />
           </Overlay>);
